@@ -13,6 +13,7 @@ const games = [
         category: "Arcade",
         status: "Available",
         description: "Place towers, hold the line and survive wave after wave.",
+        image: "assets/screenshots/tower-defence.png",
         featured: true
     }
 ];
@@ -61,6 +62,14 @@ function renderFeatured() {
             </a>
         </div>
     `;
+
+    if (featuredGame.image) {
+        container.classList.add("has-image");
+        container.style.backgroundImage = `
+            linear-gradient(120deg, rgba(13, 15, 21, 0.55), rgba(13, 15, 21, 0.88)),
+            url('${featuredGame.image}')
+        `;
+    }
 }
 
 
@@ -75,9 +84,12 @@ function renderGames() {
         const available = isAvailable(game);
         const categoryLower = game.category.toLowerCase();
 
+        const imageStyle = game.image ? ` style="background-image: url('${game.image}')"` : "";
+        const imageIcon = game.image ? "" : `<div class="game-icon">${initials(game.title)}</div>`;
+
         const inner = `
-            <div class="game-image">
-                <div class="game-icon">${initials(game.title)}</div>
+            <div class="game-image${game.image ? " has-image" : ""}"${imageStyle}>
+                ${imageIcon}
             </div>
             <div class="game-info">
                 <div class="game-meta">

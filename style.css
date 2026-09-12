@@ -236,6 +236,11 @@ input {
     align-items: flex-end;
 }
 
+.featured-card.has-image {
+    background-size: cover;
+    background-position: center;
+}
+
 .featured-glow {
     position: absolute;
     width: 400px;
@@ -479,6 +484,15 @@ input {
     inset: 0;
 
     background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.03));
+}
+
+.game-image.has-image {
+    background-size: cover;
+    background-position: center 60%;
+}
+
+.game-image.has-image::before {
+    content: none;
 }
 
 .game-card[data-category="party"] .game-image {

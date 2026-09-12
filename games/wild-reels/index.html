@@ -265,6 +265,8 @@ body {
 
 .link-row {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 16px;
 }
 
@@ -386,6 +388,7 @@ body {
     <div class="link-row">
         <button class="link-btn" id="paytableToggle" type="button">Paytable</button>
         <button class="link-btn" id="resetBtn" type="button">Reset balance</button>
+        <button class="link-btn" id="soundToggle" type="button">&#128266; Sound</button>
     </div>
 
     <div class="paytable" id="paytable">
@@ -455,6 +458,8 @@ const NUM_LINES = PAYLINES.length;
 const BET_STEPS = [1, 2, 5, 10, 20, 50];
 const STARTING_BALANCE = 100;
 const STORAGE_KEY = "playground.wildReels.balance";
+const SOUND_STORAGE_KEY = "playground.wildReels.soundEnabled";
+const BIG_WIN_MULTIPLIER = 15;
 
 const reelWindow = document.getElementById("reelWindow");
 const balanceValue = document.getElementById("balanceValue");
@@ -469,10 +474,13 @@ const paytableToggle = document.getElementById("paytableToggle");
 const paytable = document.getElementById("paytable");
 const paytableRows = document.getElementById("paytableRows");
 const resetBtn = document.getElementById("resetBtn");
+const soundToggle = document.getElementById("soundToggle");
 
 let balance = loadBalance();
 let betIndex = 2;
 let freeSpinsRemaining = 0;
+let soundEnabled = loadSoundPref();
+let audioCtx = null;
 let spinning = false;
 let grid = createEmptyGrid();
 
@@ -487,6 +495,83 @@ function saveBalance() {
     } catch (e) {
         /* localStorage unavailable; balance just won't persist */
     }
+}
+
+function loadSoundPref() {
+    try {
+        const saved = localStorage.getItem(SOUND_STORAGE_KEY);
+        return saved === null ? true : saved === "true";
+    } catch (e) {
+        return true;
+    }
+}
+
+function saveSoundPref() {
+    try {
+        localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+    } catch (e) {
+        /* localStorage unavailable; preference just won't persist */
+    }
+}
+
+function ensureAudio() {
+    if (!soundEnabled) return null;
+    if (!audioCtx) {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) return null;
+        audioCtx = new AudioCtor();
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+}
+
+function playTone({ freq, duration = 0.15, type = "sine", volume = 0.2, startTime = 0, slideTo = null }) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+
+    const t0 = ctx.currentTime + startTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + duration);
+
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(volume, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + duration + 0.03);
+}
+
+function playClick() {
+    playTone({ freq: 300, duration: 0.045, type: "square", volume: 0.12 });
+}
+
+function playWhoosh() {
+    playTone({ freq: 500, slideTo: 120, duration: 0.3, type: "sawtooth", volume: 0.1 });
+}
+
+function playReelStop() {
+    playTone({ freq: 180, duration: 0.07, type: "square", volume: 0.16 });
+}
+
+function playWinFanfare(big) {
+    const notes = big
+        ? [523.25, 659.25, 783.99, 1046.5, 1318.5]
+        : [523.25, 659.25, 783.99];
+    notes.forEach((freq, i) => {
+        playTone({ freq, duration: 0.22, type: "triangle", volume: 0.22, startTime: i * 0.09 });
+    });
+}
+
+function playScatterFanfare() {
+    const notes = [392, 523.25, 659.25, 783.99, 1046.5, 1318.5, 1567.98];
+    notes.forEach((freq, i) => {
+        playTone({ freq, duration: 0.26, type: "triangle", volume: 0.24, startTime: i * 0.08 });
+    });
 }
 
 function totalBet() {
@@ -634,6 +719,7 @@ function spin() {
     clearWinHighlights();
     setMessage(inFreeSpins ? "Free spin rolling..." : "Spinning...");
     updateUI();
+    playWhoosh();
 
     const nextGrid = createEmptyGrid();
     const spinIntervals = [];
@@ -659,6 +745,7 @@ function spin() {
                 setCellSymbol(reel, row, nextGrid[reel][row]);
                 document.getElementById(cellId(reel, row)).classList.remove("spinning");
             }
+            playReelStop();
             if (reel === 4) {
                 finishSpin(nextGrid, inFreeSpins);
             }
@@ -715,8 +802,10 @@ function finishSpin(finishedGrid, wasFreeSpins) {
     if (freeSpinsAwarded > 0) {
         const bonusText = scatterPay > 0 ? ` and ${formatMoney(scatterPay)}` : "";
         setMessage(`${scatterCount} SCATTERS! +${freeSpinsAwarded} FREE SPINS${bonusText}!`);
+        playScatterFanfare();
     } else if (totalWin > 0) {
         setMessage(`YOU WON ${formatMoney(totalWin)}!${wasFreeSpins ? " (2x free spin bonus)" : ""}`);
+        playWinFanfare(totalWin >= totalBet() * BIG_WIN_MULTIPLIER);
     } else {
         setMessage(wasFreeSpins ? "No win this free spin." : "No win. Spin again.");
     }
@@ -748,17 +837,29 @@ function buildPaytable() {
     }).join("");
 }
 
-betDown.addEventListener("click", () => changeBet(-1));
-betUp.addEventListener("click", () => changeBet(1));
+function updateSoundToggleLabel() {
+    soundToggle.innerHTML = soundEnabled ? "&#128266; Sound" : "&#128263; Sound";
+}
+
+betDown.addEventListener("click", () => { playClick(); changeBet(-1); });
+betUp.addEventListener("click", () => { playClick(); changeBet(1); });
 spinBtn.addEventListener("click", spin);
-resetBtn.addEventListener("click", resetBalance);
+resetBtn.addEventListener("click", () => { playClick(); resetBalance(); });
 paytableToggle.addEventListener("click", () => {
+    playClick();
     paytable.classList.toggle("open");
     paytableToggle.textContent = paytable.classList.contains("open") ? "Hide paytable" : "Paytable";
+});
+soundToggle.addEventListener("click", () => {
+    soundEnabled = !soundEnabled;
+    saveSoundPref();
+    updateSoundToggleLabel();
+    if (soundEnabled) playClick();
 });
 
 buildReelWindow();
 buildPaytable();
+updateSoundToggleLabel();
 updateUI();
 </script>
 

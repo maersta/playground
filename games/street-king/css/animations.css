@@ -1,0 +1,46 @@
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+.floating-text {
+    position: absolute;
+    bottom: 55%;
+    font-weight: 900;
+    font-size: 15px;
+    white-space: nowrap;
+    animation: floatUp 1.1s ease-out forwards;
+    pointer-events: none;
+}
+
+.floating-money { color: var(--good); }
+.floating-xp { color: var(--gold); }
+.floating-food { color: #4fa8e0; }
+
+@keyframes floatUp {
+    0% { transform: translateY(0); opacity: 0; }
+    15% { opacity: 1; }
+    100% { transform: translateY(-46px); opacity: 0; }
+}
+
+@keyframes barPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.5); }
+}
+
+.nav-dot {
+    animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.btn-primary:active {
+    animation: pressPulse 0.15s ease;
+}
+
+@keyframes pressPulse {
+    0% { filter: brightness(1.3); }
+    100% { filter: brightness(1); }
+}

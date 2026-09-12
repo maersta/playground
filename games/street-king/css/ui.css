@@ -1,0 +1,256 @@
+/* =========================================================
+   UI COMPONENTS
+   Buttons, bars, modals, toasts.
+========================================================= */
+
+button {
+    font-family: inherit;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+    color: #1a0d04;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.btn-secondary {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--panel-alt);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.btn-small {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--panel-alt);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.btn-small:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-small:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.btn-boss {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.btn-action {
+    padding: 12px 8px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--panel);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.btn-action:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-flee {
+    border-color: var(--text-dim);
+    color: var(--text-dim);
+}
+
+/* ---------- BARS ---------- */
+
+.bar {
+    position: relative;
+    height: 7px;
+    border-radius: 2px;
+    background: #000;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width 0.25s ease;
+}
+
+.bar-food .bar-fill, #hudFoodBar { background: var(--good); }
+.bar-health .bar-fill, #hudHealthBar { background: var(--danger); }
+.bar-energy .bar-fill, #hudEnergyBar { background: #4fa8e0; }
+.bar-xp .bar-fill, #hudXpBar { background: var(--gold); }
+.bar-stamina .bar-fill { background: #4fa8e0; }
+.bar-enemy .bar-fill { background: var(--danger); }
+.bar-mission .bar-fill { background: var(--rep); }
+
+.bar-danger .bar-fill,
+#hudHealthBar.bar-danger,
+#hudFoodBar.bar-danger {
+    background: var(--danger) !important;
+    animation: barPulse 1s ease-in-out infinite;
+}
+
+/* ---------- MODALS ---------- */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal-backdrop[hidden] {
+    display: none;
+}
+
+.modal-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 20px;
+    max-width: 420px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-title {
+    font-size: 15px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 12px;
+}
+
+.modal-text {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    color: var(--text);
+}
+
+.modal-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-gains {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.settings-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+textarea.save-textarea {
+    width: 100%;
+    min-height: 80px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: monospace;
+    font-size: 11px;
+    padding: 8px;
+    border-radius: 3px;
+    resize: vertical;
+}
+
+/* ---------- TOASTS ---------- */
+
+#toastContainer {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 10px 14px;
+    font-size: 12px;
+    max-width: 320px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-good, .toast-money { border-left-color: var(--good); }
+.toast-warn { border-left-color: var(--danger); }
+.toast-achievement, .toast-level { border-left-color: var(--gold); }
+.toast-mission, .toast-rep { border-left-color: var(--rep); }
+.toast-boss { border-left-color: var(--danger); }

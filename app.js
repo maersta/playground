@@ -39,6 +39,14 @@ const games = [
         status: "Available",
         description: "The classic snake game, but you're a dachshund chasing a bone. Don't bite your own tail.",
         image: "assets/screenshots/dachshund-dash.png"
+    },
+    {
+        title: "Street King",
+        slug: "street-king",
+        category: "Experimental",
+        status: "Available",
+        description: "A gritty clicker/idle RPG. Start homeless and broke, work the streets, fight your way up, and take over the city.",
+        image: "assets/screenshots/street-king.png"
     }
 ];
 

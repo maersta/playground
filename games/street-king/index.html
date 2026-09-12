@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Street King</title>
+
+<link rel="stylesheet" href="../../assets/portal-bar.css">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/ui.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+
+<script src="../../assets/portal-bar.js"></script>
+
+<div class="app-shell">
+
+    <header class="hud">
+        <div class="hud-top">
+            <div class="hud-title">Street King</div>
+            <div style="display:flex; gap:6px;">
+                <button class="icon-btn" id="soundToggleBtn" type="button">&#128266; Sound</button>
+                <button class="icon-btn" id="menuBtn" type="button">&#9776; Menu</button>
+            </div>
+        </div>
+
+        <div class="hud-stats">
+            <div class="hud-stat">
+                <div class="hud-stat-label">Money</div>
+                <div class="hud-stat-value" id="hudMoney">$0</div>
+            </div>
+            <div class="hud-stat">
+                <div class="hud-stat-label">Level</div>
+                <div class="hud-stat-value" id="hudLevel">1</div>
+            </div>
+            <div class="hud-stat">
+                <div class="hud-stat-label">Reputation</div>
+                <div class="hud-stat-value" id="hudReputation">0 · Nobody</div>
+            </div>
+        </div>
+
+        <div class="hud-bars">
+            <div class="hud-bar-block">
+                <div class="hud-bar-label">Health <span id="hudHealth"></span></div>
+                <div class="bar"><div class="bar-fill" id="hudHealthBar" style="width:100%"></div></div>
+            </div>
+            <div class="hud-bar-block">
+                <div class="hud-bar-label">Energy <span id="hudEnergy"></span></div>
+                <div class="bar"><div class="bar-fill" id="hudEnergyBar" style="width:100%"></div></div>
+            </div>
+            <div class="hud-bar-block">
+                <div class="hud-bar-label">Food <span id="hudFood"></span></div>
+                <div class="bar"><div class="bar-fill" id="hudFoodBar" style="width:100%"></div></div>
+            </div>
+        </div>
+
+        <div class="hud-bar-block" style="margin-top:6px;">
+            <div class="hud-bar-label"><span id="hudXpText"></span></div>
+            <div class="bar"><div class="bar-fill" id="hudXpBar" style="width:0%"></div></div>
+        </div>
+    </header>
+
+    <nav class="main-nav" id="mainNav"></nav>
+
+    <main class="panels">
+
+        <section class="panel" id="panel-home">
+            <div class="home-action">
+                <div id="floatingLayer"></div>
+                <div class="home-status" id="homeStatusTitle">HOMELESS</div>
+                <div class="home-job-name" id="homeJobName">SEARCHING FOR SCRAP</div>
+                <div class="home-job-desc" id="homeJobDesc"></div>
+                <button class="btn-primary" id="doItBtn" type="button">DO IT</button>
+            </div>
+
+            <div class="home-shelter-card" id="homeShelterCard"></div>
+            <button class="btn-secondary" id="shelterUpgradeBtn" type="button" hidden></button>
+
+            <div class="home-log" id="homeLog"></div>
+        </section>
+
+        <section class="panel" id="panel-work" hidden>
+            <h2 class="panel-title">Work</h2>
+            <div class="card-grid" id="workList"></div>
+        </section>
+
+        <section class="panel" id="panel-fight" hidden></section>
+
+        <section class="panel" id="panel-equipment" hidden>
+            <h2 class="panel-title">Equipment</h2>
+            <div class="equip-slots" id="equipSlots"></div>
+
+            <div class="section-heading">Inventory</div>
+            <div class="card-grid" id="equipInventory"></div>
+
+            <div class="section-heading">Shop</div>
+            <div class="card-grid" id="equipShop"></div>
+        </section>
+
+        <section class="panel" id="panel-skills" hidden>
+            <h2 class="panel-title">Skills</h2>
+            <p class="empty-note" id="skillPointsLabel" style="margin-bottom:12px;"></p>
+            <div class="skill-branches" id="skillBranches"></div>
+        </section>
+
+        <section class="panel" id="panel-city" hidden>
+            <h2 class="panel-title">City</h2>
+            <div class="card-grid" id="cityList"></div>
+        </section>
+
+        <section class="panel" id="panel-crew" hidden></section>
+        <section class="panel" id="panel-businesses" hidden></section>
+
+        <section class="panel" id="panel-missions" hidden>
+            <h2 class="panel-title">Missions</h2>
+            <div class="card-grid" id="missionsList"></div>
+        </section>
+
+        <section class="panel" id="panel-achievements" hidden>
+            <h2 class="panel-title">Achievements</h2>
+            <div class="achievements-grid" id="achievementsGrid"></div>
+        </section>
+
+        <section class="panel" id="panel-newlife" hidden></section>
+
+    </main>
+</div>
+
+<div id="toastContainer"></div>
+
+<div class="modal-backdrop" id="eventModal" hidden>
+    <div class="modal-box">
+        <div class="modal-title">Street Encounter</div>
+        <p class="modal-text" id="eventText"></p>
+        <div class="modal-choices" id="eventChoices"></div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="welcomeModal" hidden>
+    <div class="modal-box">
+        <div class="modal-title">Welcome Back</div>
+        <p class="modal-text">You were away for <strong id="welcomeAwayTime"></strong>. While you were gone:</p>
+        <div class="modal-gains" id="welcomeGains"></div>
+        <button class="btn-primary" id="closeWelcomeBtn" type="button">CLAIM</button>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="settingsModal" hidden>
+    <div class="modal-box">
+        <div class="modal-title">Menu</div>
+
+        <div class="settings-row">
+            <button class="btn-secondary" id="saveBtn" type="button">SAVE</button>
+            <button class="btn-secondary" id="exportBtn" type="button">EXPORT SAVE</button>
+            <textarea class="save-textarea" id="saveTextarea" placeholder="Paste a save here to import it..."></textarea>
+            <button class="btn-secondary" id="importBtn" type="button">IMPORT SAVE</button>
+            <button class="btn-secondary" id="resetBtn" type="button" style="color:var(--danger);">RESET PROGRESS</button>
+        </div>
+
+        <button class="btn-secondary" id="closeSettingsBtn" type="button">CLOSE</button>
+    </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/player.js"></script>
+<script src="js/shelter.js"></script>
+<script src="js/equipment.js"></script>
+<script src="js/skills.js"></script>
+<script src="js/jobs.js"></script>
+<script src="js/combat.js"></script>
+<script src="js/events.js"></script>
+<script src="js/missions.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/city.js"></script>
+<script src="js/crew.js"></script>
+<script src="js/businesses.js"></script>
+<script src="js/prestige.js"></script>
+<script src="js/save.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/gameLoop.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

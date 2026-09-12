@@ -23,6 +23,13 @@ const games = [
         status: "Available",
         description: "Classic tic-tac-toe, except The Curse plays perfectly and always wants your soul.",
         image: "assets/screenshots/bloody-tic-tac-toe.png"
+    },
+    {
+        title: "Wild Reels",
+        slug: "wild-reels",
+        category: "Casual",
+        status: "Available",
+        description: "A 10-line slot machine with wilds and free spins. Starts you off with $100 in fake money."
     }
 ];
 

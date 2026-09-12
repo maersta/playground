@@ -29,7 +29,8 @@ const games = [
         slug: "wild-reels",
         category: "Casual",
         status: "Available",
-        description: "A 10-line slot machine with wilds and free spins. Starts you off with $100 in fake money."
+        description: "A 10-line slot machine with wilds and free spins. Starts you off with $100 in fake money.",
+        image: "assets/screenshots/wild-reels.png"
     }
 ];
 

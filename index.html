@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Playground — Games. Experiments. Whatever.</title>
+    <meta name="description" content="Playground is a collection of small games, experiments and random ideas. Pick something and start playing.">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <nav class="navbar">
+        <div class="nav-inner">
+
+            <a href="#" class="logo">
+                <span class="logo-mark">P</span>
+                <span>Playground</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#games">Games</a>
+                <a href="#featured">Featured</a>
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
+    <header class="hero">
+
+        <div class="hero-glow" aria-hidden="true"></div>
+
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                <span class="status-dot"></span>
+                Games. Experiments. Whatever.
+            </div>
+
+            <h1>
+                Pick a game.<br>
+                <span>Start playing.</span>
+            </h1>
+
+            <p>
+                Playground is a growing collection of small games,
+                quick experiments and random ideas that didn't need
+                to be bigger than this. No accounts, no downloads —
+                just pick something and play.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         FEATURED
+    ========================== -->
+
+    <section class="featured" id="featured">
+        <div class="featured-card" id="featuredCard">
+            <!-- Rendered dynamically from games data in app.js -->
+        </div>
+    </section>
+
+
+    <!-- =========================
+         GAMES
+    ========================== -->
+
+    <main class="games-section" id="games">
+
+        <div class="section-header">
+
+            <div class="section-title">
+                <h2>All games</h2>
+                <p>Everything in the collection, in one place.</p>
+            </div>
+
+            <div class="search">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Search games..."
+                    autocomplete="off"
+                    aria-label="Search games"
+                >
+            </div>
+
+        </div>
+
+
+        <!-- FILTERS -->
+
+        <div class="filters" role="group" aria-label="Filter games by category">
+
+            <button class="filter active" data-category="all">
+                All
+            </button>
+
+            <button class="filter" data-category="party">
+                Party
+            </button>
+
+            <button class="filter" data-category="arcade">
+                Arcade
+            </button>
+
+            <button class="filter" data-category="casual">
+                Casual
+            </button>
+
+            <button class="filter" data-category="experimental">
+                Experimental
+            </button>
+
+        </div>
+
+
+        <!-- GAME CARDS (rendered dynamically) -->
+
+        <div class="game-grid" id="gameGrid">
+            <!-- Rendered dynamically from games data in app.js -->
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            No games found.
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+        <div class="footer-inner">
+
+            <span>Playground</span>
+            <span>Games. Experiments. Whatever.</span>
+
+        </div>
+
+    </footer>
+
+
+    <script src="app.js"></script>
+
+</body>
+</html>

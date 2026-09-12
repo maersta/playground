@@ -137,6 +137,10 @@ body {
     50% { filter: brightness(1.25); }
 }
 
+.reel-stage {
+    position: relative;
+}
+
 .reel-window {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -149,6 +153,58 @@ body {
 
     background: #0a0510;
     box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.win-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    pointer-events: none;
+}
+
+.win-text {
+    padding: 0 10px;
+    font-size: clamp(28px, 9vw, 56px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    white-space: nowrap;
+
+    color: #fff6d5;
+    text-shadow:
+        0 0 18px rgba(255, 215, 0, 0.9),
+        0 0 40px rgba(255, 157, 0, 0.6);
+
+    animation: winPop 1.8s ease forwards;
+}
+
+.win-text.big {
+    font-size: clamp(34px, 12vw, 70px);
+    color: #fff9e6;
+    text-shadow:
+        0 0 22px rgba(255, 215, 0, 1),
+        0 0 55px rgba(255, 120, 0, 0.75),
+        0 0 90px rgba(255, 60, 0, 0.4);
+}
+
+.win-text.bonus {
+    color: #d8ffe9;
+    text-shadow:
+        0 0 18px rgba(120, 255, 150, 0.9),
+        0 0 40px rgba(60, 220, 130, 0.6);
+}
+
+@keyframes winPop {
+    0% { transform: scale(0.3) translateY(16px); opacity: 0; }
+    18% { transform: scale(1.15) translateY(0); opacity: 1; }
+    28% { transform: scale(1) translateY(0); opacity: 1; }
+    78% { transform: scale(1) translateY(-4px); opacity: 1; }
+    100% { transform: scale(0.92) translateY(-22px); opacity: 0; }
 }
 
 .cell {
@@ -370,7 +426,10 @@ body {
     <div class="free-spins-banner" id="freeSpinsBanner">FREE SPINS: 0 LEFT (2x WIN)</div>
 
     <div class="machine-frame">
-        <div class="reel-window" id="reelWindow" role="group" aria-label="Slot reels"></div>
+        <div class="reel-stage">
+            <div class="reel-window" id="reelWindow" role="group" aria-label="Slot reels"></div>
+            <div class="win-overlay" id="winOverlay" aria-live="polite"></div>
+        </div>
     </div>
 
     <p class="message" id="messageText" aria-live="polite">Place your bet and spin.</p>
@@ -462,6 +521,7 @@ const SOUND_STORAGE_KEY = "playground.wildReels.soundEnabled";
 const BIG_WIN_MULTIPLIER = 15;
 
 const reelWindow = document.getElementById("reelWindow");
+const winOverlay = document.getElementById("winOverlay");
 const balanceValue = document.getElementById("balanceValue");
 const lastWinValue = document.getElementById("lastWinValue");
 const freeSpinsBanner = document.getElementById("freeSpinsBanner");
@@ -483,6 +543,7 @@ let soundEnabled = loadSoundPref();
 let audioCtx = null;
 let spinning = false;
 let grid = createEmptyGrid();
+let winOverlayTimeout = null;
 
 function loadBalance() {
     const saved = Number(localStorage.getItem(STORAGE_KEY));
@@ -627,6 +688,20 @@ function highlightCell(reel, row) {
     document.getElementById(cellId(reel, row)).classList.add("win");
 }
 
+function showWinOverlay(text, variantClass) {
+    clearTimeout(winOverlayTimeout);
+    winOverlay.innerHTML = "";
+
+    const el = document.createElement("div");
+    el.className = "win-text" + (variantClass ? ` ${variantClass}` : "");
+    el.textContent = text;
+    winOverlay.appendChild(el);
+
+    winOverlayTimeout = setTimeout(() => {
+        winOverlay.innerHTML = "";
+    }, 1800);
+}
+
 function evaluateLine(currentGrid, line) {
     const symbols = line.map((row, reel) => currentGrid[reel][row]);
     if (symbols[0] === "scatter") return null;
@@ -717,6 +792,8 @@ function spin() {
 
     spinning = true;
     clearWinHighlights();
+    clearTimeout(winOverlayTimeout);
+    winOverlay.innerHTML = "";
     setMessage(inFreeSpins ? "Free spin rolling..." : "Spinning...");
     updateUI();
     playWhoosh();
@@ -799,13 +876,20 @@ function finishSpin(finishedGrid, wasFreeSpins) {
 
     lastWinValue.textContent = formatMoney(totalWin);
 
+    const isBigWin = totalWin >= totalBet() * BIG_WIN_MULTIPLIER;
+
     if (freeSpinsAwarded > 0) {
         const bonusText = scatterPay > 0 ? ` and ${formatMoney(scatterPay)}` : "";
         setMessage(`${scatterCount} SCATTERS! +${freeSpinsAwarded} FREE SPINS${bonusText}!`);
         playScatterFanfare();
+        showWinOverlay(`+${freeSpinsAwarded} FREE SPINS!`, "bonus");
     } else if (totalWin > 0) {
         setMessage(`YOU WON ${formatMoney(totalWin)}!${wasFreeSpins ? " (2x free spin bonus)" : ""}`);
-        playWinFanfare(totalWin >= totalBet() * BIG_WIN_MULTIPLIER);
+        playWinFanfare(isBigWin);
+        showWinOverlay(
+            isBigWin ? `BIG WIN! ${formatMoney(totalWin)}` : formatMoney(totalWin),
+            isBigWin ? "big" : ""
+        );
     } else {
         setMessage(wasFreeSpins ? "No win this free spin." : "No win. Spin again.");
     }
@@ -820,6 +904,8 @@ function resetBalance() {
     freeSpinsRemaining = 0;
     lastWinValue.textContent = formatMoney(0);
     clearWinHighlights();
+    clearTimeout(winOverlayTimeout);
+    winOverlay.innerHTML = "";
     setMessage("Balance reset to $100. Good luck.");
     saveBalance();
     updateUI();

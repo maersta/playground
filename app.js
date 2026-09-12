@@ -23,6 +23,13 @@ const games = [
         description: "Drop the ball, dodge the chaos and chase a higher score."
     },
     {
+        title: "Tower Defence",
+        slug: "tower-defence",
+        category: "Arcade",
+        status: "Available",
+        description: "Place towers, hold the line and survive wave after wave."
+    },
+    {
         title: "Something New",
         slug: "something-new",
         category: "Casual",

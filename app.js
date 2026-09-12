@@ -8,40 +8,12 @@
 
 const games = [
     {
-        title: "Brutal Questions",
-        slug: "brutal-questions",
-        category: "Party",
-        status: "Available",
-        description: "A party game filled with questions you probably shouldn't ask.",
-        featured: true
-    },
-    {
-        title: "Ball Drop",
-        slug: "ball-drop",
-        category: "Arcade",
-        status: "Available",
-        description: "Drop the ball, dodge the chaos and chase a higher score."
-    },
-    {
         title: "Tower Defence",
         slug: "tower-defence",
         category: "Arcade",
         status: "Available",
-        description: "Place towers, hold the line and survive wave after wave."
-    },
-    {
-        title: "Something New",
-        slug: "something-new",
-        category: "Casual",
-        status: "Coming Soon",
-        description: "A relaxed casual game that's still taking shape."
-    },
-    {
-        title: "Another Game",
-        slug: "another-game",
-        category: "Experimental",
-        status: "Coming Soon",
-        description: "A weird little experiment we're not ready to talk about yet."
+        description: "Place towers, hold the line and survive wave after wave.",
+        featured: true
     }
 ];
 

@@ -50,8 +50,10 @@ function isAvailable(game) {
 ========================================================= */
 
 function renderFeatured() {
-    const featuredGame = games.find(game => game.featured);
     const container = document.getElementById("featuredCard");
+    if (!container) return;
+
+    const featuredGame = games.find(game => game.featured);
 
     if (!featuredGame) {
         container.style.display = "none";

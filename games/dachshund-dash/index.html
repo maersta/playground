@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dachshund Dash</title>
+
+<link rel="stylesheet" href="../../assets/portal-bar.css">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    background: radial-gradient(circle at 50% 15%, #16321d, #081109 75%);
+    color: #eef5ea;
+    font-family: "Trebuchet MS", "Segoe UI", ui-sans-serif, sans-serif;
+    user-select: none;
+}
+
+.stage {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 16px 40px;
+}
+
+.title {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(26px, 6vw, 40px);
+    font-weight: 900;
+    letter-spacing: 2px;
+
+    background: linear-gradient(135deg, #ffe3b0, #d99a4e 50%, #8a5a24);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    text-shadow: 0 0 30px rgba(217, 154, 78, 0.25);
+}
+
+.subtitle {
+    margin: 0;
+    color: #a9c9a8;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.hud-stat {
+    flex: 1 1 100px;
+    min-width: 90px;
+
+    padding: 8px 10px;
+    border: 1px solid rgba(217, 154, 78, 0.3);
+    border-radius: 10px;
+    background: rgba(10, 24, 14, 0.6);
+
+    text-align: center;
+}
+
+.hud-stat .label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #86a687;
+    margin-bottom: 3px;
+}
+
+.hud-stat .value {
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffcf87;
+}
+
+.canvas-frame {
+    padding: 10px;
+    border: 6px solid #3c2210;
+    border-radius: 16px;
+    background: #1a0f08;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+}
+
+#gameCanvas {
+    display: block;
+    width: min(88vw, 400px);
+    height: min(88vw, 400px);
+    border-radius: 8px;
+    image-rendering: pixelated;
+}
+
+.message {
+    min-height: 20px;
+    max-width: 420px;
+    text-align: center;
+    font-size: 13px;
+    color: #d9ead6;
+    letter-spacing: 0.3px;
+}
+
+.dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 46px);
+    grid-template-rows: repeat(3, 46px);
+    gap: 6px;
+}
+
+.dpad button {
+    grid-column: var(--col);
+    grid-row: var(--row);
+
+    border: 1px solid rgba(217, 154, 78, 0.35);
+    border-radius: 8px;
+    background: #1e2a1a;
+    color: #ffcf87;
+
+    font-size: 18px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.dpad button:active {
+    background: #33421f;
+}
+
+.dpad-up { --col: 2; --row: 1; }
+.dpad-left { --col: 1; --row: 2; }
+.dpad-right { --col: 3; --row: 2; }
+.dpad-down { --col: 2; --row: 3; }
+
+.new-game-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(135deg, #ffcf87, #d99a4e);
+    color: #331d08;
+
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.new-game-btn:hover {
+    transform: translateY(-2px);
+}
+</style>
+</head>
+
+<body>
+
+<script src="../../assets/portal-bar.js"></script>
+
+<div class="stage">
+    <h1 class="title">DACHSHUND DASH</h1>
+    <p class="subtitle">The classic snake game. Now with ears.</p>
+
+    <div class="hud">
+        <div class="hud-stat">
+            <span class="label">Score</span>
+            <span class="value" id="scoreValue">0</span>
+        </div>
+        <div class="hud-stat">
+            <span class="label">Best</span>
+            <span class="value" id="bestValue">0</span>
+        </div>
+        <div class="hud-stat">
+            <span class="label">Length</span>
+            <span class="value" id="lengthValue">3</span>
+        </div>
+    </div>
+
+    <div class="canvas-frame">
+        <canvas id="gameCanvas" width="400" height="400" role="img" aria-label="Dachshund Dash game board"></canvas>
+    </div>
+
+    <p class="message" id="messageText" aria-live="polite">Press an arrow key or tap a control to start.</p>
+
+    <div class="dpad" role="group" aria-label="Direction controls">
+        <button class="dpad-up" type="button" aria-label="Move up">&#9650;</button>
+        <button class="dpad-left" type="button" aria-label="Move left">&#9664;</button>
+        <button class="dpad-right" type="button" aria-label="Move right">&#9654;</button>
+        <button class="dpad-down" type="button" aria-label="Move down">&#9660;</button>
+    </div>
+
+    <button class="new-game-btn" id="newGameBtn" type="button">New Game</button>
+</div>
+
+<script>
+const GRID_SIZE = 20;
+const CANVAS_SIZE = 400;
+const CELL = CANVAS_SIZE / GRID_SIZE;
+
+const BASE_INTERVAL = 150;
+const MIN_INTERVAL = 80;
+const SPEEDUP_STEP = 3;
+
+const HIGH_SCORE_KEY = "playground.dachshundDash.highScore";
+
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreValue = document.getElementById("scoreValue");
+const bestValue = document.getElementById("bestValue");
+const lengthValue = document.getElementById("lengthValue");
+const messageText = document.getElementById("messageText");
+const newGameBtn = document.getElementById("newGameBtn");
+
+let snake = [];
+let direction = { x: 1, y: 0 };
+let pendingDirection = { x: 1, y: 0 };
+let food = { x: 0, y: 0 };
+let score = 0;
+let highScore = loadHighScore();
+let tickInterval = BASE_INTERVAL;
+let timerId = null;
+let started = false;
+let isGameOver = false;
+
+function loadHighScore() {
+    const saved = Number(localStorage.getItem(HIGH_SCORE_KEY));
+    return Number.isFinite(saved) && saved > 0 ? saved : 0;
+}
+
+function saveHighScore() {
+    try {
+        localStorage.setItem(HIGH_SCORE_KEY, String(highScore));
+    } catch (e) {
+        /* localStorage unavailable; high score just won't persist */
+    }
+}
+
+function randomCell() {
+    return {
+        x: Math.floor(Math.random() * GRID_SIZE),
+        y: Math.floor(Math.random() * GRID_SIZE)
+    };
+}
+
+function spawnFood() {
+    let cell;
+    do {
+        cell = randomCell();
+    } while (snake.some(seg => seg.x === cell.x && seg.y === cell.y));
+    return cell;
+}
+
+function setMessage(text) {
+    messageText.textContent = text;
+}
+
+function updateHud() {
+    scoreValue.textContent = score;
+    bestValue.textContent = highScore;
+    lengthValue.textContent = snake.length;
+}
+
+function resetGame() {
+    clearInterval(timerId);
+    timerId = null;
+
+    const startX = Math.floor(GRID_SIZE / 2);
+    const startY = Math.floor(GRID_SIZE / 2);
+    snake = [
+        { x: startX, y: startY },
+        { x: startX - 1, y: startY },
+        { x: startX - 2, y: startY }
+    ];
+
+    direction = { x: 1, y: 0 };
+    pendingDirection = { x: 1, y: 0 };
+    score = 0;
+    tickInterval = BASE_INTERVAL;
+    started = false;
+    isGameOver = false;
+    food = spawnFood();
+
+    setMessage("Press an arrow key or tap a control to start.");
+    updateHud();
+    render();
+}
+
+function startLoop() {
+    clearInterval(timerId);
+    timerId = setInterval(tick, tickInterval);
+}
+
+function tick() {
+    direction = pendingDirection;
+
+    const newHead = {
+        x: snake[0].x + direction.x,
+        y: snake[0].y + direction.y
+    };
+
+    const hitWall =
+        newHead.x < 0 || newHead.x >= GRID_SIZE ||
+        newHead.y < 0 || newHead.y >= GRID_SIZE;
+
+    const hitSelf = snake.some(seg => seg.x === newHead.x && seg.y === newHead.y);
+
+    if (hitWall || hitSelf) {
+        gameOver();
+        return;
+    }
+
+    snake.unshift(newHead);
+
+    if (newHead.x === food.x && newHead.y === food.y) {
+        score++;
+        if (score > highScore) {
+            highScore = score;
+            saveHighScore();
+        }
+        food = spawnFood();
+        tickInterval = Math.max(MIN_INTERVAL, tickInterval - SPEEDUP_STEP);
+        startLoop();
+    } else {
+        snake.pop();
+    }
+
+    updateHud();
+    render();
+}
+
+function gameOver() {
+    clearInterval(timerId);
+    timerId = null;
+    started = false;
+    isGameOver = true;
+    setMessage(`GAME OVER! Score: ${score} (Best: ${highScore}). Press a direction to try again.`);
+}
+
+function setDirection(dx, dy) {
+    if (isGameOver) {
+        resetGame();
+    }
+
+    if (snake.length > 1 && dx === -direction.x && dy === -direction.y) {
+        return;
+    }
+
+    pendingDirection = { x: dx, y: dy };
+
+    if (!started) {
+        started = true;
+        direction = pendingDirection;
+        setMessage("");
+        startLoop();
+    }
+}
+
+function drawRoundedRect(x, y, w, h, r, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function directionAngle(dir) {
+    if (dir.x === 1) return 0;
+    if (dir.x === -1) return Math.PI;
+    if (dir.y === 1) return Math.PI / 2;
+    if (dir.y === -1) return -Math.PI / 2;
+    return 0;
+}
+
+function drawHead(cx, cy, dir) {
+    const size = CELL;
+    const angle = directionAngle(dir);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    ctx.fillStyle = "#3a2210";
+    ctx.beginPath();
+    ctx.ellipse(-size * 0.25, -size * 0.42, size * 0.22, size * 0.32, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(-size * 0.25, size * 0.42, size * 0.22, size * 0.32, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    drawRoundedRect(-size * 0.55, -size * 0.5, size * 1.1, size, size * 0.35, "#d99a4e");
+    drawRoundedRect(size * 0.3, -size * 0.28, size * 0.5, size * 0.56, size * 0.2, "#d99a4e");
+
+    ctx.fillStyle = "#2b1710";
+    ctx.beginPath();
+    ctx.arc(size * 0.78, 0, size * 0.09, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#1b0f08";
+    ctx.beginPath();
+    ctx.arc(size * 0.15, -size * 0.2, size * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(size * 0.15, size * 0.2, size * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+function drawBoard() {
+    for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+            ctx.fillStyle = (row + col) % 2 === 0 ? "#20351f" : "#1a2c19";
+            ctx.fillRect(col * CELL, row * CELL, CELL, CELL);
+        }
+    }
+}
+
+function drawFood() {
+    ctx.font = `${CELL}px serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("\u{1F9B4}", food.x * CELL + CELL / 2, food.y * CELL + CELL / 2 + 1);
+}
+
+function render() {
+    drawBoard();
+    drawFood();
+
+    for (let i = snake.length - 1; i >= 0; i--) {
+        const seg = snake[i];
+        const cx = seg.x * CELL + CELL / 2;
+        const cy = seg.y * CELL + CELL / 2;
+
+        if (i === 0) {
+            drawHead(cx, cy, direction);
+        } else if (i === snake.length - 1 && snake.length > 1) {
+            const scale = 0.6;
+            drawRoundedRect(
+                cx - (CELL * scale) / 2,
+                cy - (CELL * scale) / 2,
+                CELL * scale,
+                CELL * scale,
+                CELL * 0.2,
+                "#c9812f"
+            );
+        } else {
+            const shade = i % 2 === 0 ? "#d99a4e" : "#c9812f";
+            drawRoundedRect(
+                seg.x * CELL + 1,
+                seg.y * CELL + 1,
+                CELL - 2,
+                CELL - 2,
+                CELL * 0.3,
+                shade
+            );
+        }
+    }
+}
+
+const KEY_DIRECTIONS = {
+    ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0],
+    w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0],
+    W: [0, -1], S: [0, 1], A: [-1, 0], D: [1, 0]
+};
+
+document.addEventListener("keydown", e => {
+    const dir = KEY_DIRECTIONS[e.key];
+    if (!dir) return;
+    if (e.key.startsWith("Arrow")) e.preventDefault();
+    setDirection(dir[0], dir[1]);
+});
+
+document.querySelector(".dpad-up").addEventListener("click", () => setDirection(0, -1));
+document.querySelector(".dpad-down").addEventListener("click", () => setDirection(0, 1));
+document.querySelector(".dpad-left").addEventListener("click", () => setDirection(-1, 0));
+document.querySelector(".dpad-right").addEventListener("click", () => setDirection(1, 0));
+newGameBtn.addEventListener("click", resetGame);
+
+resetGame();
+</script>
+
+</body>
+</html>

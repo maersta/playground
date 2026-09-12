@@ -31,6 +31,14 @@ const games = [
         status: "Available",
         description: "A 10-line slot machine with wilds and free spins. Starts you off with $100 in fake money.",
         image: "assets/screenshots/wild-reels.png"
+    },
+    {
+        title: "Dachshund Dash",
+        slug: "dachshund-dash",
+        category: "Arcade",
+        status: "Available",
+        description: "The classic snake game, but you're a dachshund chasing a bone. Don't bite your own tail.",
+        image: "assets/screenshots/dachshund-dash.png"
     }
 ];
 

@@ -15,6 +15,14 @@ const games = [
         description: "Place towers, hold the line and survive wave after wave.",
         image: "assets/screenshots/tower-defence.png",
         featured: true
+    },
+    {
+        title: "Bloody Tic-Tac-Toe",
+        slug: "bloody-tic-tac-toe",
+        category: "Casual",
+        status: "Available",
+        description: "Classic tic-tac-toe, except The Curse plays perfectly and always wants your soul.",
+        image: "assets/screenshots/bloody-tic-tac-toe.png"
     }
 ];
 

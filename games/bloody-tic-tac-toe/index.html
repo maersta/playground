@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloody Tic-Tac-Toe</title>
+
+<link rel="stylesheet" href="../../assets/portal-bar.css">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    background: radial-gradient(circle at 50% 30%, #200707, #050202 75%);
+    color: #e8dede;
+    font-family: Georgia, "Times New Roman", serif;
+    user-select: none;
+}
+
+.stage {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 20px;
+}
+
+.vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 40%, transparent 40%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+.drips {
+    position: absolute;
+    inset: 0;
+    top: -2px;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.drip {
+    position: absolute;
+    top: -10px;
+    width: 5px;
+    border-radius: 3px;
+    background: linear-gradient(#8a0000, rgba(138, 0, 0, 0));
+    animation: dripFall linear infinite;
+}
+
+.drip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -4px;
+    width: 8px;
+    height: 8px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: #7a0000;
+    box-shadow: 0 0 6px rgba(122, 0, 0, 0.8);
+}
+
+@keyframes dripFall {
+    0% { height: 0; opacity: 0.9; }
+    75% { opacity: 0.85; }
+    100% { height: 160px; opacity: 0; }
+}
+
+.title {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(28px, 6vw, 46px);
+    letter-spacing: 5px;
+    line-height: 1.15;
+    color: #c11a1a;
+    text-shadow:
+        0 2px 0 #5a0000,
+        0 8px 10px rgba(120, 0, 0, 0.55),
+        0 18px 18px rgba(60, 0, 0, 0.35);
+    animation: flicker 5s infinite;
+}
+
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 80%, 100% { opacity: 1; }
+    20%, 22%, 24% { opacity: 0.75; }
+    50% { opacity: 0.92; }
+}
+
+.subtitle {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    min-height: 22px;
+    color: #bb9999;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.board {
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+
+    width: min(78vw, 320px);
+    aspect-ratio: 1;
+    padding: 10px;
+
+    background: #0b0808;
+    border: 2px solid #3a0808;
+    border-radius: 10px;
+
+    box-shadow:
+        0 0 40px rgba(150, 0, 0, 0.25) inset,
+        0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.cell {
+    position: relative;
+
+    background: #161010;
+    border: 1px solid #2c1414;
+    border-radius: 6px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: inherit;
+    font-size: clamp(32px, 8vw, 52px);
+    font-weight: 900;
+    color: transparent;
+
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.cell:not(.filled):hover {
+    background: #201212;
+}
+
+.cell.filled {
+    cursor: default;
+}
+
+.cell.x,
+.cell.o {
+    color: #c0181f;
+    text-shadow:
+        0 2px 0 #6d0000,
+        0 8px 8px rgba(109, 0, 0, 0.55),
+        0 16px 14px rgba(60, 0, 0, 0.3);
+}
+
+.cell:nth-child(1) { transform: rotate(-3deg); }
+.cell:nth-child(3) { transform: rotate(2deg); }
+.cell:nth-child(4) { transform: rotate(1deg); }
+.cell:nth-child(6) { transform: rotate(-2deg); }
+.cell:nth-child(7) { transform: rotate(2deg); }
+.cell:nth-child(9) { transform: rotate(-1deg); }
+
+.cell.win {
+    animation: pulseWin 0.9s ease-in-out infinite;
+}
+
+@keyframes pulseWin {
+    0%, 100% { box-shadow: none; }
+    50% { box-shadow: 0 0 25px 6px rgba(255, 30, 30, 0.55) inset; }
+}
+
+.restart-btn {
+    position: relative;
+    z-index: 2;
+    margin-top: 4px;
+
+    padding: 12px 22px;
+    border: 1px solid #5a0000;
+    border-radius: 8px;
+
+    background: #200606;
+    color: #e8caca;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.restart-btn:hover {
+    background: #3a0a0a;
+    transform: translateY(-2px);
+}
+
+body.shake {
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-6px, 3px); }
+    40% { transform: translate(6px, -3px); }
+    60% { transform: translate(-4px, 2px); }
+    80% { transform: translate(4px, -2px); }
+}
+
+.flash {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(150, 0, 0, 0.35);
+}
+
+.flash.active {
+    animation: flashFade 0.6s ease;
+}
+
+@keyframes flashFade {
+    0% { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<script src="../../assets/portal-bar.js"></script>
+
+<div class="stage">
+    <div class="drips" id="drips" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <h1 class="title">BLOODY<br>TIC-TAC-TOE</h1>
+    <p class="subtitle" id="statusText" aria-live="polite">Your move, mortal.</p>
+
+    <div class="board" id="board" role="group" aria-label="Tic-tac-toe board"></div>
+
+    <button class="restart-btn" id="restartBtn" type="button">Tempt Fate Again</button>
+</div>
+
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<script>
+const LINES = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6]
+];
+
+const boardEl = document.getElementById("board");
+const statusText = document.getElementById("statusText");
+const restartBtn = document.getElementById("restartBtn");
+const flashEl = document.getElementById("flash");
+const dripsEl = document.getElementById("drips");
+
+let board = Array(9).fill(null);
+let gameOver = false;
+let locked = false;
+
+function spawnDrips(count) {
+    dripsEl.innerHTML = "";
+    for (let i = 0; i < count; i++) {
+        const drip = document.createElement("div");
+        drip.className = "drip";
+        drip.style.left = `${Math.random() * 100}%`;
+        drip.style.animationDuration = `${3 + Math.random() * 3}s`;
+        drip.style.animationDelay = `${Math.random() * 4}s`;
+        dripsEl.appendChild(drip);
+    }
+}
+
+function createBoard() {
+    boardEl.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("button");
+        cell.className = "cell";
+        cell.type = "button";
+        cell.setAttribute("aria-label", `Cell ${i + 1}`);
+        cell.addEventListener("click", () => handleMove(i));
+        boardEl.appendChild(cell);
+    }
+}
+
+function render() {
+    const cells = boardEl.children;
+    for (let i = 0; i < 9; i++) {
+        const value = board[i];
+        cells[i].textContent = value || "";
+        cells[i].className = "cell" + (value ? ` filled ${value.toLowerCase()}` : "");
+    }
+}
+
+function getResult(bd) {
+    for (const [a, b, c] of LINES) {
+        if (bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) {
+            return { winner: bd[a], line: [a, b, c] };
+        }
+    }
+    if (bd.every(value => value)) {
+        return { winner: "draw" };
+    }
+    return null;
+}
+
+function minimax(bd, isMaximizing, depth) {
+    const result = getResult(bd);
+    if (result) {
+        if (result.winner === "O") return 10 - depth;
+        if (result.winner === "X") return depth - 10;
+        return 0;
+    }
+
+    if (isMaximizing) {
+        let best = -Infinity;
+        for (let i = 0; i < 9; i++) {
+            if (!bd[i]) {
+                bd[i] = "O";
+                best = Math.max(best, minimax(bd, false, depth + 1));
+                bd[i] = null;
+            }
+        }
+        return best;
+    }
+
+    let best = Infinity;
+    for (let i = 0; i < 9; i++) {
+        if (!bd[i]) {
+            bd[i] = "X";
+            best = Math.min(best, minimax(bd, true, depth + 1));
+            bd[i] = null;
+        }
+    }
+    return best;
+}
+
+function bestMove() {
+    let best = -Infinity;
+    let move = -1;
+
+    for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+            board[i] = "O";
+            const score = minimax(board, false, 0);
+            board[i] = null;
+
+            if (score > best) {
+                best = score;
+                move = i;
+            }
+        }
+    }
+
+    return move;
+}
+
+function highlightWin(line) {
+    const cells = boardEl.children;
+    line.forEach(i => cells[i].classList.add("win"));
+}
+
+function triggerFlash() {
+    flashEl.classList.remove("active");
+    void flashEl.offsetWidth;
+    flashEl.classList.add("active");
+
+    document.body.classList.remove("shake");
+    void document.body.offsetWidth;
+    document.body.classList.add("shake");
+}
+
+function endGame(result) {
+    gameOver = true;
+    locked = true;
+
+    if (result.winner === "draw") {
+        statusText.textContent = "A draw. The Curse lets you live... for now.";
+    } else if (result.winner === "X") {
+        statusText.textContent = "IMPOSSIBLE. YOU BROKE THE CURSE.";
+        highlightWin(result.line);
+    } else {
+        statusText.textContent = "THE CURSE CLAIMS ANOTHER SOUL.";
+        highlightWin(result.line);
+        triggerFlash();
+    }
+}
+
+function handleMove(index) {
+    if (gameOver || locked || board[index]) return;
+
+    board[index] = "X";
+    render();
+
+    const result = getResult(board);
+    if (result) {
+        endGame(result);
+        return;
+    }
+
+    locked = true;
+    statusText.textContent = "The Curse is thinking...";
+
+    setTimeout(() => {
+        const move = bestMove();
+        if (move !== -1) {
+            board[move] = "O";
+            render();
+        }
+
+        const result2 = getResult(board);
+        if (result2) {
+            endGame(result2);
+        } else {
+            locked = false;
+            statusText.textContent = "Your move, mortal.";
+        }
+    }, 450);
+}
+
+function restart() {
+    board = Array(9).fill(null);
+    gameOver = false;
+    locked = false;
+    statusText.textContent = "Your move, mortal.";
+    render();
+}
+
+restartBtn.addEventListener("click", restart);
+
+createBoard();
+render();
+spawnDrips(6);
+</script>
+
+</body>
+</html>

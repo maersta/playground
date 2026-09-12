@@ -130,94 +130,13 @@ input {
 }
 
 /* =========================
-   HERO
-========================= */
-
-.hero {
-    position: relative;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 90px 24px 70px;
-    overflow: hidden;
-}
-
-.hero-glow {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    right: -180px;
-    top: -220px;
-
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(124, 92, 255, 0.22), transparent 70%);
-    filter: blur(10px);
-    pointer-events: none;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 1;
-    max-width: 720px;
-}
-
-.eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 7px 12px;
-    margin-bottom: 22px;
-
-    border: 1px solid var(--border);
-    border-radius: 999px;
-
-    background: rgba(255, 255, 255, 0.035);
-    color: var(--muted);
-
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-.status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #5cff9d;
-    box-shadow: 0 0 12px rgba(92, 255, 157, 0.7);
-}
-
-.hero h1 {
-    font-size: clamp(42px, 7vw, 76px);
-    line-height: 0.98;
-    letter-spacing: -4px;
-    margin-bottom: 24px;
-}
-
-.hero h1 span {
-    background: linear-gradient(135deg, #ffffff, #a78bfa 55%, #6f9dff);
-
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.hero p {
-    max-width: 600px;
-    color: var(--muted);
-    font-size: 17px;
-    line-height: 1.7;
-}
-
-/* =========================
    FEATURED GAME
 ========================= */
 
 .featured {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 0 24px 70px;
+    padding: 48px 24px 70px;
 }
 
 .featured-card {
@@ -659,13 +578,9 @@ footer {
         display: none;
     }
 
-    .hero {
-        padding-top: 65px;
+    .featured {
+        padding-top: 32px;
         padding-bottom: 50px;
-    }
-
-    .hero h1 {
-        letter-spacing: -2.5px;
     }
 
     .featured-card {

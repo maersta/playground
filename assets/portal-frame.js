@@ -16,7 +16,9 @@
         '#gameFrame{flex:1 1 auto;min-height:0;width:100%;border:0;display:block}</style></head><body>' +
         '<div class="portal-bar"><a href="../../index.html"><span class="portal-bar-arrow" aria-hidden="true">←</span>' +
         '<span class="portal-bar-mark">P</span><span>Playground</span></a></div>' +
-        '<iframe id="gameFrame" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe></body></html>'
+        '<iframe id="gameFrame" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>' +
+        /* The browser keeps parsing the rest of the original page; swallow it as inert hidden text. */
+        '<style>plaintext{display:none}</style><plaintext>'
     );
     document.close();
     var f = document.getElementById("gameFrame");

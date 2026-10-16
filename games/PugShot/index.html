@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1a1423">
+  <title>MOPS - Pug Slingshot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+
+    <!-- In-game HUD buttons (the rest of the HUD is drawn on the canvas) -->
+    <div id="hud-buttons" class="hidden">
+      <button id="btn-pause" class="icon-btn" title="Pause">II</button>
+      <button id="btn-mute-hud" class="icon-btn" title="Sound">&#9834;</button>
+    </div>
+
+    <!-- MAIN MENU -->
+    <div id="menu" class="overlay">
+      <div class="panel menu-panel">
+        <div id="title-holder" class="title-holder"></div>
+        <div class="subtitle">THE PUG SLINGSHOT</div>
+        <div class="menu-stats">
+          <div class="stat-box"><span class="stat-label">BEST</span><span id="menu-best" class="stat-value">0m</span></div>
+          <div class="stat-box"><span class="stat-label">COINS</span><span id="menu-coins" class="stat-value coin-text">0</span></div>
+          <div class="stat-box hidden" id="menu-stars-box"><span class="stat-label">STARS</span><span id="menu-stars" class="stat-value star-text">0</span></div>
+        </div>
+        <div id="menu-world" class="menu-world"></div>
+        <button id="btn-play" class="pixel-btn btn-big btn-green">PLAY</button>
+        <div class="menu-grid">
+          <button id="btn-upgrades" class="pixel-btn btn-yellow">UPGRADES</button>
+          <button id="btn-shop" class="pixel-btn btn-pink">SHOP</button>
+          <button id="btn-worlds" class="pixel-btn btn-blue">WORLDS</button>
+          <button id="btn-quests" class="pixel-btn btn-purple">QUESTS<span id="quest-dot" class="dot hidden"></span></button>
+        </div>
+        <button id="btn-howto" class="pixel-btn btn-small">HOW TO PLAY</button>
+        <div class="menu-footer">
+          <button id="btn-mute" class="pixel-btn btn-small">SOUND: ON</button>
+          <button id="btn-stats" class="pixel-btn btn-small">STATS</button>
+          <button id="btn-reset" class="pixel-btn btn-small btn-red">RESET</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPGRADES -->
+    <div id="upgrades" class="overlay hidden">
+      <div class="panel wide-panel">
+        <div class="panel-header">
+          <div id="upgrades-title" class="heading-holder"></div>
+          <div class="coin-pill"><span class="coin-icon"></span><span id="upg-coins">0</span></div>
+        </div>
+        <div id="upgrade-grid" class="upgrade-grid"></div>
+        <div class="panel-buttons">
+          <button id="btn-upg-back" class="pixel-btn">BACK</button>
+          <button id="btn-upg-play" class="pixel-btn btn-green">PLAY</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div id="shop" class="overlay hidden">
+      <div class="panel wide-panel">
+        <div class="panel-header">
+          <div id="shop-title" class="heading-holder"></div>
+          <div class="pills"><div class="coin-pill"><span class="coin-icon"></span><span id="shop-coins">0</span></div>
+          <div class="coin-pill star-pill">&#9733;<span id="shop-stars">0</span></div></div>
+        </div>
+        <div id="shop-tabs" class="tabs"></div>
+        <div id="shop-grid" class="upgrade-grid"></div>
+        <div class="panel-buttons"><button id="btn-shop-back" class="pixel-btn">BACK</button></div>
+      </div>
+    </div>
+
+    <!-- WORLDS -->
+    <div id="worlds" class="overlay hidden">
+      <div class="panel wide-panel">
+        <div class="panel-header">
+          <div id="worlds-title" class="heading-holder"></div>
+          <div class="pills"><div class="coin-pill star-pill">&#9733;<span id="worlds-stars">0</span></div></div>
+        </div>
+        <div id="worlds-grid" class="upgrade-grid"></div>
+        <div class="panel-buttons">
+          <button id="btn-worlds-back" class="pixel-btn">BACK</button>
+          <button id="btn-worlds-ascend" class="pixel-btn btn-yellow">ASCEND &#9733;</button>
+          <button id="btn-worlds-play" class="pixel-btn btn-green">PLAY</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASCEND (prestige) -->
+    <div id="ascend" class="overlay hidden">
+      <div class="panel wide-panel">
+        <div class="panel-header">
+          <div id="ascend-title" class="heading-holder"></div>
+          <div class="pills"><div class="coin-pill star-pill">&#9733;<span id="ascend-stars">0</span></div></div>
+        </div>
+        <div id="ascend-box" class="ascend-box"></div>
+        <div id="ascend-grid" class="upgrade-grid"></div>
+        <div class="panel-buttons"><button id="btn-ascend-back" class="pixel-btn">BACK</button></div>
+      </div>
+    </div>
+
+    <!-- QUESTS -->
+    <div id="quests" class="overlay hidden">
+      <div class="panel wide-panel">
+        <div id="quests-title" class="heading-holder"></div>
+        <div id="quests-body" class="quests-body"></div>
+        <div class="panel-buttons"><button id="btn-quests-back" class="pixel-btn">BACK</button></div>
+      </div>
+    </div>
+
+    <!-- DAILY GIFT -->
+    <div id="daily" class="overlay hidden">
+      <div class="panel small-panel">
+        <div id="daily-title" class="heading-holder"></div>
+        <div id="daily-body" class="daily-body"></div>
+        <button id="btn-daily-claim" class="pixel-btn btn-green">CLAIM!</button>
+      </div>
+    </div>
+
+    <!-- HOW TO PLAY -->
+    <div id="howto" class="overlay hidden">
+      <div class="panel">
+        <div id="howto-title" class="heading-holder"></div>
+        <ol class="howto-list">
+          <li><b>Pull</b> the pug backwards - press &amp; drag anywhere.</li>
+          <li><b>Aim</b> your shot using the dotted trajectory.</li>
+          <li><b>Release</b> to launch. Further pull = more power.</li>
+          <li><b>Bounce</b> as far as possible across the land.</li>
+          <li><b>Collect coins</b> - golden ones are worth more!</li>
+          <li><b>Avoid hazards</b>: spikes, saws, lava and pits.</li>
+          <li><b>Buy upgrades</b>, slingshots &amp; skins between runs.</li>
+          <li><b>Ascend</b> after 1000m+ to earn stars and unlock new worlds!</li>
+        </ol>
+        <div class="howto-tips">
+          <div><span class="tip-key">SPRINGS</span> &amp; <span class="tip-key">TNT</span> launch you. <span class="tip-key">BOOST PADS</span> speed you up.</div>
+          <div><span class="tip-key">MUD</span> slows you, <span class="tip-key">ICE</span> is slippery, <span class="tip-key">STONE</span> is bouncy.</div>
+          <div>Smash crates, bonk birds and pop balloons to build your <span class="tip-key">COMBO</span>.</div>
+          <div>With <span class="tip-key">AIR CONTROL</span>: hold &larr; / &rarr; (or the left / right side of the screen) while flying.</div>
+        </div>
+        <div class="panel-buttons">
+          <button id="btn-howto-back" class="pixel-btn">BACK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div id="stats" class="overlay hidden">
+      <div class="panel">
+        <div id="stats-title" class="heading-holder"></div>
+        <div id="stats-list" class="stats-list"></div>
+        <div class="panel-buttons">
+          <button id="btn-stats-back" class="pixel-btn">BACK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results" class="overlay hidden">
+      <div class="panel results-panel">
+        <div id="results-title" class="heading-holder"></div>
+        <div id="results-reason" class="results-reason">OUT OF STEAM</div>
+        <div id="results-record" class="record-banner hidden">NEW RECORD!</div>
+        <div id="results-rows" class="results-rows"></div>
+        <div id="results-events" class="results-events"></div>
+        <div class="results-total">
+          <span>COINS EARNED</span>
+          <span class="coin-pill big"><span class="coin-icon"></span><span id="results-coins">0</span></span>
+        </div>
+        <div class="panel-buttons">
+          <button id="btn-res-menu" class="pixel-btn btn-small">MENU</button>
+          <button id="btn-res-upgrades" class="pixel-btn btn-yellow">UPGRADES</button>
+          <button id="btn-res-ascend" class="pixel-btn btn-purple hidden">ASCEND &#9733;</button>
+          <button id="btn-res-again" class="pixel-btn btn-green">PLAY AGAIN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE -->
+    <div id="pause" class="overlay hidden">
+      <div class="panel small-panel">
+        <div id="pause-title" class="heading-holder"></div>
+        <button id="btn-resume" class="pixel-btn btn-green">RESUME</button>
+        <button id="btn-end-run" class="pixel-btn btn-yellow">END RUN</button>
+        <div class="panel-buttons">
+          <button id="btn-restart" class="pixel-btn btn-small">RESTART</button>
+          <button id="btn-quit" class="pixel-btn btn-small btn-red">QUIT TO MENU</button>
+        </div>
+        <div class="howto-tips">RESTART and QUIT skip the results (no rewards).</div>
+      </div>
+    </div>
+
+    <!-- CONFIRM DIALOG -->
+    <div id="confirm" class="overlay hidden">
+      <div class="panel small-panel">
+        <div class="confirm-text" id="confirm-text">Reset ALL progress?<br>This cannot be undone!</div>
+        <div class="panel-buttons">
+          <button id="btn-confirm-no" class="pixel-btn">NO</button>
+          <button id="btn-confirm-yes" class="pixel-btn btn-red">YES, RESET</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="rotate-hint" class="hidden">Tip: rotate your device for a wider view</div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/meta.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/terrain.js"></script>
+  <script src="js/obstacles.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/pug.js"></script>
+  <script src="js/hud.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/ui-meta.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

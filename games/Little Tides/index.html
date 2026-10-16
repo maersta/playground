@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Little Tides</title>
+  <meta name="description" content="A cozy, hand-drawn fishing and collection game. Catch fish, fill your fish book, and explore seven seas.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="stage" aria-label="Game world"></canvas>
+
+    <header id="hud">
+      <div class="hud-group">
+        <button class="pill btn-pill" data-act="open" data-arg="map" title="World Map (M)">
+          <span class="ico" data-icon="map"></span><span id="hud-zone">Pebble Cove</span>
+        </button>
+        <div class="pill" id="hud-boat" title="Current boat"></div>
+        <div class="pill" id="hud-bait" title="Equipped bait"></div>
+        <button class="pill btn-pill" id="hud-pet" data-act="open" data-arg="pets" title="Companions (P)"></button>
+      </div>
+      <div class="hud-group">
+        <div class="pill" id="hud-clock" title="Time of day"></div>
+        <div class="pill coins" id="hud-coins" title="Coins"><span class="ico" data-icon="coin"></span><b id="coins-num">0</b></div>
+        <button class="pill btn-pill cargo" data-act="open" data-arg="cargo" title="Cargo (C)">
+          <span class="ico" data-icon="cargo"></span>
+          <span class="bar"><i id="cargo-bar"></i></span>
+          <b id="cargo-text">0/10</b>
+        </button>
+      </div>
+    </header>
+
+    <div id="boosts" aria-label="Active boosts"></div>
+
+    <div id="status" aria-live="polite">
+      <span id="status-text"></span>
+      <button class="btn small primary hidden" id="status-btn" data-act="harbor">Go to Harbor</button>
+    </div>
+
+    <aside id="guide" aria-label="Controls">
+      <div><kbd>A</kbd><kbd>D</kbd> or <kbd>&larr;</kbd><kbd>&rarr;</kbd> steer</div>
+      <div><kbd>W</kbd><kbd>S</kbd> or <kbd>&uarr;</kbd><kbd>&darr;</kbd> depth</div>
+      <div><kbd>SPACE</kbd> cast</div>
+      <div><kbd>H</kbd> harbor &nbsp; <kbd>ESC</kbd> menu</div>
+    </aside>
+
+    <aside id="depth" aria-label="Fishing depth">
+      <button class="mini" data-act="depth" data-arg="-1" title="Shallower (W)">&#9650;</button>
+      <div class="depth-bar" id="depth-bar" data-act="depth-click"><i class="d-limit" id="depth-limit"></i><i class="d-mark" id="depth-mark"></i></div>
+      <button class="mini" data-act="depth" data-arg="1" title="Deeper (S)">&#9660;</button>
+      <div class="depth-label" id="depth-label"></div>
+    </aside>
+
+    <nav id="nav" aria-label="Main navigation">
+      <button class="nav-btn" id="nav-harbor" data-act="harbor"><span class="ico" data-icon="anchor"></span><span class="lbl" id="nav-harbor-lbl">Harbor</span></button>
+      <button class="nav-btn" data-act="open" data-arg="map"><span class="ico" data-icon="map"></span><span class="lbl">Map</span></button>
+      <button class="nav-btn" data-act="open" data-arg="book" id="nav-book"><span class="ico" data-icon="book"></span><span class="lbl">Fish Book</span><i class="badge hidden"></i></button>
+      <button class="nav-btn" data-act="open" data-arg="cargo"><span class="ico" data-icon="cargo"></span><span class="lbl">Cargo</span></button>
+      <button class="nav-btn" data-act="open" data-arg="shop" id="nav-shop"><span class="ico" data-icon="shop"></span><span class="lbl">Shop</span></button>
+      <button class="nav-btn" data-act="open" data-arg="quests" id="nav-quests"><span class="ico" data-icon="scroll"></span><span class="lbl">Requests</span><i class="badge hidden"></i></button>
+      <button class="nav-btn" data-act="open" data-arg="pets"><span class="ico" data-icon="paw"></span><span class="lbl">Pets</span></button>
+      <button class="nav-btn" data-act="open" data-arg="stats"><span class="ico" data-icon="chart"></span><span class="lbl">Records</span></button>
+      <button class="nav-btn" data-act="open" data-arg="pause"><span class="ico" data-icon="gear"></span><span class="lbl">Menu</span></button>
+    </nav>
+
+    <div id="toasts" aria-live="polite"></div>
+    <div id="catch" class="hidden"></div>
+    <div id="modal-root"></div>
+    <div id="confirm-root"></div>
+  </div>
+  <noscript>Little Tides needs JavaScript to run.</noscript>
+  <script>
+    // If the game script did not start (usually because the page was opened as a file), explain why.
+    setTimeout(function () {
+      if (window.__littleTides) return;
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;inset:0;z-index:99;background:#1d3a4a;color:#fbf3e0;display:flex;align-items:center;justify-content:center;padding:24px;font:16px/1.6 system-ui,sans-serif;text-align:center';
+      d.innerHTML = '<div style="max-width:560px"><h2 style="font-family:Georgia,serif">Little Tides could not start</h2>' +
+        (location.protocol === 'file:'
+          ? '<p>Browsers block game scripts when a page is opened directly from a file.</p><p>Make sure <b>js/bundle.js</b> is next to index.html.</p>'
+          : '<p>The game script failed to load. Open the browser console (F12) for details.</p>') + '</div>';
+      document.body.appendChild(d);
+    }, 1500);
+  </script>
+  <script src="js/bundle.js"></script>
+</body>
+</html>

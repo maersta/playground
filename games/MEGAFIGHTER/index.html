@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>FIST CLUB</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+ <div class="game-column">
+  <!-- ================= TOP STATUS BAR ================= -->
+  <div class="topbar">
+    <div class="fighter-card player-card">
+      <div class="fc-label">PLAYER</div>
+      <div class="fc-name" id="playerName">CHAMP</div>
+      <div class="hpbar"><div class="hpfill player-hp" id="playerHpFill"></div></div>
+      <div class="hp-text" id="playerHpText">240 / 240</div>
+    </div>
+
+    <div class="venue-card">
+      <div class="fc-label">VENUE</div>
+      <div class="venue-name" id="venueName">BACK ALLEY</div>
+      <div class="stage-label" id="stageLabel">STAGE 1-1</div>
+      <div class="lvl-badge">LV <span id="playerLevel">1</span></div>
+    </div>
+
+    <div class="fighter-card enemy-card">
+      <div class="fc-label">NOW FIGHTING</div>
+      <div class="fc-name" id="enemyName">THUG</div>
+      <div class="hpbar"><div class="hpfill enemy-hp" id="enemyHpFill"></div></div>
+      <div class="stars" id="enemyStars">★</div>
+    </div>
+  </div>
+
+  <!-- ================= BATTLE STAGE ================= -->
+  <div class="stage" id="battleStage">
+    <div class="stage-bg">
+      <div class="wall-streak" style="left:8%"></div>
+      <div class="wall-streak" style="left:22%"></div>
+      <div class="wall-streak" style="left:61%"></div>
+      <div class="wall-streak" style="left:80%"></div>
+      <div class="window-light" style="left:12%"></div>
+      <div class="window-light" style="left:88%"></div>
+    </div>
+
+    <div class="fistclub-sign">FIST CLUB</div>
+
+    <div class="dumpster" id="dumpsterLeft"><span>FIST</span></div>
+    <div class="trash-can" id="trashRight"></div>
+
+    <div class="fight-zone" id="fightZone">
+      <div class="fighter player-fighter" id="playerFighter">
+        <div class="dmg-pop-anchor"></div>
+        <div class="f-head"></div>
+        <div class="f-body"></div>
+        <div class="f-arm f-arm-l"></div>
+        <div class="f-arm f-arm-r"></div>
+        <div class="f-leg f-leg-l"></div>
+        <div class="f-leg f-leg-r"></div>
+        <div class="f-glove f-glove-l"></div>
+        <div class="f-glove f-glove-r"></div>
+      </div>
+
+      <div class="fighter enemy-fighter" id="enemyFighter">
+        <div class="dmg-pop-anchor"></div>
+        <div class="f-head"></div>
+        <div class="f-body enemy-body"></div>
+        <div class="f-arm f-arm-l"></div>
+        <div class="f-arm f-arm-r"></div>
+        <div class="f-leg f-leg-l"></div>
+        <div class="f-leg f-leg-r"></div>
+        <div class="f-glove f-glove-l enemy-glove"></div>
+        <div class="f-glove f-glove-r enemy-glove"></div>
+      </div>
+
+      <div class="ground-shadow ground-shadow-p"></div>
+      <div class="ground-shadow ground-shadow-e"></div>
+    </div>
+
+    <div class="energy-badge" id="energyBadge">
+      <svg viewBox="0 0 24 24" class="clock-icon"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm.75 5v5.4l4.2 2.5-.75 1.3-5-3V7h1.55z"/></svg>
+      <span id="energyText">10/10</span>
+    </div>
+
+    <button id="logToggleBtn" class="icon-btn log-toggle" title="Combat Log">💬</button>
+    <button id="achToggleBtn" class="icon-btn ach-toggle" title="Achievements">♡</button>
+    <button id="settingsToggleBtn" class="icon-btn settings-toggle" title="Settings">⟳</button>
+
+    <div class="combat-log" id="combatLog">
+      <div class="panel-title">COMBAT LOG <button class="close-x" data-close="combatLog">✕</button></div>
+      <div class="log-entries" id="logEntries"></div>
+    </div>
+
+    <div class="ach-panel" id="achPanel">
+      <div class="panel-title">ACHIEVEMENTS <button class="close-x" data-close="achPanel">✕</button></div>
+      <div class="ach-list" id="achList"></div>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+      <div class="panel-title">SETTINGS <button class="close-x" data-close="settingsPanel">✕</button></div>
+      <label class="setting-row"><span>Sound Effects</span><input type="checkbox" id="soundToggle" checked></label>
+      <label class="setting-row"><span>Battle Speed</span>
+        <select id="battleSpeedSelect">
+          <option value="1">1x</option>
+          <option value="2">2x</option>
+          <option value="4">4x</option>
+        </select>
+      </label>
+      <button class="danger-btn" id="hardResetBtn">RESET SAVE</button>
+    </div>
+
+    <div class="toast-stack" id="toastStack"></div>
+  </div>
+
+  <!-- ================= TIMER / FIGHT CONTROL ================= -->
+  <div class="fight-controls">
+    <div class="timer-pill" id="timerPill">1:00</div>
+    <button class="fight-btn" id="fightBtn">FIGHT!</button>
+  </div>
+
+  <!-- ================= STATS BAR ================= -->
+  <div class="statsbar" id="statsBar">
+    <div class="stat-cell"><div class="stat-k">HP</div><div class="stat-v" id="statHP">240</div></div>
+    <div class="stat-cell"><div class="stat-k">ATK</div><div class="stat-v" id="statATK">50</div></div>
+    <div class="stat-cell"><div class="stat-k">DEF</div><div class="stat-v" id="statDEF">30</div></div>
+    <div class="stat-cell"><div class="stat-k">SPD</div><div class="stat-v" id="statSPD">110</div></div>
+    <div class="stat-cell"><div class="stat-k">CRT</div><div class="stat-v" id="statCRT">1%</div></div>
+    <div class="stat-cell"><div class="stat-k">CMB</div><div class="stat-v" id="statCMB">1%</div></div>
+    <div class="stat-cell"><div class="stat-k">STA</div><div class="stat-v" id="statSTA">1%</div></div>
+    <div class="stat-cell"><div class="stat-k">DGE</div><div class="stat-v" id="statDGE">1%</div></div>
+  </div>
+
+  <!-- ================= CURRENCY ROW ================= -->
+  <div class="currency-row">
+    <div class="currency-chip">🪙 <span id="fistCoins">0</span></div>
+    <div class="currency-chip">⭐ XP <span id="xpText">0/100</span></div>
+    <div class="currency-chip">🧠 SP <span id="skillPoints">0</span></div>
+  </div>
+ </div>
+
+ <div class="side-column">
+  <!-- ================= TABS ================= -->
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="gear">Gear</button>
+    <button class="tab-btn" data-tab="skills">Skills</button>
+    <button class="tab-btn locked" data-tab="gym">Gym <span class="lock">🔒</span></button>
+    <button class="tab-btn locked" data-tab="arena">Arena <span class="lock">🔒</span></button>
+    <button class="tab-btn" data-tab="cheats">Cheats</button>
+  </div>
+
+  <div class="tab-content" id="tabContent">
+
+    <!-- GEAR -->
+    <div class="tab-panel active" id="panel-gear">
+      <div class="gear-grid" id="gearGrid"></div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="tab-panel" id="panel-skills">
+      <div class="skills-list" id="skillsList"></div>
+    </div>
+
+    <!-- GYM -->
+    <div class="tab-panel" id="panel-gym">
+      <div class="locked-msg" id="gymLockedMsg">Reach Level 5 to unlock the Gym.</div>
+      <div class="gym-list" id="gymList"></div>
+    </div>
+
+    <!-- ARENA -->
+    <div class="tab-panel" id="panel-arena">
+      <div class="locked-msg" id="arenaLockedMsg">Reach Level 10 to unlock the Arena.</div>
+      <div class="arena-panel" id="arenaPanel">
+        <div class="arena-stats">
+          <div>Current Streak: <b id="arenaStreak">0</b></div>
+          <div>Best Streak: <b id="arenaBest">0</b></div>
+          <div>Arena Points: <b id="arenaPoints">0</b></div>
+        </div>
+        <div class="arena-opponent" id="arenaOpponentPreview">Next opponent: —</div>
+        <button class="primary-btn" id="arenaFightBtn">FIGHT IN ARENA</button>
+      </div>
+    </div>
+
+    <!-- CHEATS -->
+    <div class="tab-panel" id="panel-cheats">
+      <div class="cheats-list">
+        <label class="setting-row"><span>God Mode (take no damage)</span><input type="checkbox" id="cheatGodMode"></label>
+        <label class="setting-row"><span>One-Hit KO</span><input type="checkbox" id="cheatOneHit"></label>
+        <label class="setting-row"><span>Infinite Energy</span><input type="checkbox" id="cheatInfEnergy"></label>
+        <label class="setting-row"><span>Double Rewards</span><input type="checkbox" id="cheatDoubleRewards"></label>
+        <button class="primary-btn cheat-btn" id="cheatAddCoins">+10,000 🪙</button>
+        <button class="primary-btn cheat-btn" id="cheatAddSkill">+25 🧠 Skill Points</button>
+        <button class="primary-btn cheat-btn" id="cheatAddLevels">+5 Levels</button>
+        <button class="primary-btn cheat-btn" id="cheatRefillEnergy">Refill Energy</button>
+        <button class="primary-btn cheat-btn" id="cheatUnlockAll">Unlock All Venues</button>
+        <button class="danger-btn cheat-btn" id="cheatResetSave">Reset Save</button>
+      </div>
+    </div>
+
+  </div>
+ </div>
+
+  <!-- RESULT / LEVEL-UP MODALS (fixed to the viewport so they're never
+       clipped by the battle stage's own bounds) -->
+  <div class="result-modal" id="resultModal">
+    <div class="result-box">
+      <div class="result-title" id="resultTitle">VICTORY!</div>
+      <div class="result-rewards" id="resultRewards"></div>
+      <button class="primary-btn" id="resultContinueBtn">CONTINUE</button>
+    </div>
+  </div>
+
+  <div class="levelup-modal" id="levelupModal">
+    <div class="result-box">
+      <div class="result-title lvl-title">LEVEL UP!</div>
+      <div class="result-rewards" id="levelupBody"></div>
+      <button class="primary-btn" id="levelupCloseBtn">NICE</button>
+    </div>
+  </div>
+
+  <!-- GEAR UPGRADE SHEET -->
+  <div class="gear-sheet-backdrop" id="gearSheetBackdrop">
+    <div class="gear-sheet" id="gearSheet">
+      <div class="panel-title"><span id="gearSheetTitle">HEAD</span><button class="close-x" data-close="gearSheetBackdrop">✕</button></div>
+      <div class="gear-sheet-icon" id="gearSheetIcon"></div>
+      <div class="gear-sheet-level">Level <span id="gearSheetLevel">0</span></div>
+      <div class="gear-sheet-bonus" id="gearSheetBonus"></div>
+      <div class="gear-sheet-next" id="gearSheetNext"></div>
+      <button class="primary-btn" id="gearSheetUpgradeBtn">UPGRADE</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

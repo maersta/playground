@@ -47,6 +47,62 @@ const games = [
         status: "Available",
         description: "A gritty clicker/idle RPG. Start homeless and broke, work the streets, fight your way up, and take over the city.",
         image: "assets/screenshots/street-king.png"
+    },
+    {
+        title: "Little Tides",
+        slug: "Little Tides",
+        category: "Casual",
+        status: "Available",
+        description: "A cozy, hand-drawn fishing game. Catch 84 fish across seven seas, upgrade your boat and fill your fish book.",
+        image: "assets/screenshots/little-tides.png"
+    },
+    {
+        title: "Little Ocean",
+        slug: "Little Ocean",
+        category: "Casual",
+        status: "Available",
+        description: "A cozy tale of growing up in the deep blue. Swim, eat, evolve and pick upgrades each run.",
+        image: "assets/screenshots/little-ocean.png"
+    },
+    {
+        title: "Triangle Breakout",
+        slug: "Triangle Breakout",
+        category: "Experimental",
+        status: "Available",
+        description: "A breakout-style incremental: buy upgrades, escape cores and permanent progression.",
+        image: "assets/screenshots/triangle-breakout.png"
+    },
+    {
+        title: "Pixel Tower Defense",
+        slug: "TOWERDEFENCE YO",
+        category: "Arcade",
+        status: "Available",
+        description: "Pixel-style tower defense with archers, cannons, frost and snipers across 10 waves.",
+        image: "assets/screenshots/pixel-tower-defense.png"
+    },
+    {
+        title: "MOPS - Pug Slingshot",
+        slug: "PugShot",
+        category: "Arcade",
+        status: "Available",
+        description: "Sling a pug across the land in a pixel-art launcher with coins, upgrades and daily gifts.",
+        image: "assets/screenshots/mops-pug-slingshot.png"
+    },
+    {
+        title: "FIST CLUB",
+        slug: "MEGAFIGHTER",
+        category: "Arcade",
+        status: "Available",
+        description: "A fighting game with levels, combat log and achievements. Step into the ring.",
+        image: "assets/screenshots/fist-club.png"
+    },
+    {
+        title: "Asphalt All-Stars",
+        slug: "Streetworks TheGame",
+        category: "Casual",
+        status: "Available",
+        description: "A Streetworks painting competition. Move, aim and paint the asphalt against your coworkers.",
+        image: "assets/screenshots/asphalt-all-stars.png"
     }
 ];
 

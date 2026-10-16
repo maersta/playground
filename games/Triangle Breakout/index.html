@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#050816">
+<meta name="description" content="Triangle Breakout - a neon physics idle game. Smash through a triangle world and escape.">
+<title>Triangle Breakout</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <header id="hud">
+    <div class="hud-row">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 20H2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="14" r="2.2" fill="#fff"/></svg>
+        <div class="brand-text">
+          <h1>TRIANGLE BREAKOUT</h1>
+          <div class="sub" id="vRun">RUN 1</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span class="lbl">Score</span><span class="val" id="vScore">0</span></div>
+        <div class="stat gold" id="stCredits"><span class="lbl">Credits</span><span class="val" id="vCredits">0</span></div>
+        <div class="stat"><span class="lbl">Balls</span><span class="val"><span id="vBalls">1</span><small id="vBallsMax">/6</small></span></div>
+        <div class="stat"><span class="lbl">Destroyed</span><span class="val"><span id="vDestroyed">0</span><small id="vTotal">/0</small></span></div>
+        <div class="stat"><span class="lbl">World</span><span class="val" id="vPct">0%</span></div>
+        <div class="stat core"><span class="lbl">Cores</span><span class="val" id="vCores">0</span></div>
+      </div>
+
+      <div class="hud-actions">
+        <button class="icon-btn" id="btnPause" title="Pause (Space)" aria-label="Pause">
+          <svg viewBox="0 0 24 24"><path id="icoPause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+        </button>
+        <button class="icon-btn" id="btnSound" title="Sound" aria-label="Toggle sound">
+          <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path id="icoWave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <button class="icon-btn" id="btnSettings" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="16" cy="7" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="17" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="worldbar" title="World destruction"><i id="worldFill"></i></div>
+  </header>
+
+  <div id="stage">
+    <div id="arena">
+      <canvas id="game"></canvas>
+      <div id="toasts"></div>
+
+      <button id="escapeBanner" class="banner hidden">
+        <span>World escaped!</span><b id="bannerReward"></b><em>Prestige now</em>
+      </button>
+
+      <div id="pauseOverlay" class="overlay hidden">
+        <div class="dialog small">
+          <h2>PAUSED</h2>
+          <p class="muted">The simulation is frozen. You can still buy upgrades.</p>
+          <button class="btn primary big" id="btnResume">Resume</button>
+        </div>
+      </div>
+
+      <div id="victory" class="overlay hidden">
+        <div class="dialog victory">
+          <div class="v-kicker">BREAKOUT COMPLETE</div>
+          <h2>YOU ESCAPED THE WORLD</h2>
+          <div class="v-reward"><span id="vicReward">+3</span><small>Escape Cores</small></div>
+          <div class="v-stats" id="vicStats"></div>
+          <div class="v-actions">
+            <button class="btn gold big" id="btnPrestige">Prestige &amp; start next run</button>
+            <button class="btn ghost" id="btnKeep">Keep viewing</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside id="panel">
+      <button id="panelHandle" class="handle" aria-expanded="false">
+        <span class="h-title">UPGRADES</span>
+        <span class="h-credits" id="hCredits">0</span>
+        <svg viewBox="0 0 24 24" class="chev"><path d="m6 15 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <nav class="tabs" id="tabs">
+        <button data-tab="upgrades" class="active">Upgrades</button>
+        <button data-tab="prestige">Prestige</button>
+        <button data-tab="milestones">Milestones</button>
+      </nav>
+      <div class="panel-body">
+        <section id="tabUpgrades" class="tab active">
+          <div class="cap-line">Balls <b id="capBalls">1 / 6</b><span class="sep"></span>Spend <b class="goldtxt">credits</b> to power up this run</div>
+          <div id="runList" class="cards"></div>
+        </section>
+        <section id="tabPrestige" class="tab">
+          <div class="core-box">
+            <div class="core-num"><span id="pCores">0</span><small>Escape Cores</small></div>
+            <div class="core-sub" id="pInfo">Escape the world to unlock prestige.</div>
+            <button class="btn gold big hidden" id="btnPrestigeTab">Prestige</button>
+          </div>
+          <div id="prestigeList" class="cards"></div>
+          <div class="lifetime" id="lifeStats"></div>
+        </section>
+        <section id="tabMilestones" class="tab">
+          <div id="msList" class="ms-list"></div>
+        </section>
+      </div>
+    </aside>
+  </div>
+
+  <div id="modalSettings" class="overlay hidden">
+    <div class="dialog">
+      <h2>Settings</h2>
+      <div class="set-row"><label for="setSound">Sound</label><input type="checkbox" id="setSound" class="switch"></div>
+      <div class="set-row"><label for="setVolume">Volume</label><input type="range" id="setVolume" min="0" max="100" step="5"></div>
+      <div class="set-row"><label for="setParticles">Particle quality</label>
+        <select id="setParticles"><option value="0">Off</option><option value="1">Low</option><option value="2">Medium</option><option value="3">High</option></select></div>
+      <div class="set-row"><label for="setReduced">Reduced visual effects</label><input type="checkbox" id="setReduced" class="switch"></div>
+      <div class="set-row"><label for="setShake">Screen shake</label><input type="checkbox" id="setShake" class="switch"></div>
+      <div class="set-actions">
+        <button class="btn primary" id="btnSetResume">Resume game</button>
+        <button class="btn ghost" id="btnSetBack">Return to game</button>
+      </div>
+      <button class="btn danger" id="btnReset">Reset save&hellip;</button>
+    </div>
+  </div>
+
+  <div id="modalConfirm" class="overlay hidden">
+    <div class="dialog small">
+      <h2>Erase all progress?</h2>
+      <p class="muted">This permanently deletes your current run, Escape Cores, permanent upgrades, milestones and statistics. It cannot be undone.</p>
+      <div class="set-actions">
+        <button class="btn ghost" id="btnConfirmNo">Cancel</button>
+        <button class="btn danger solid" id="btnConfirmYes">Erase everything</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/util.js"></script>
+<script src="js/world.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/upgrades.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/economy.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/save.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

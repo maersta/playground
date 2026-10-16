@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Little Ocean</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="game" aria-label="Little Ocean game world"></canvas>
+
+<!-- ============ IN-GAME HUD ============ -->
+<div id="hud" class="hidden">
+  <div class="hud-left panel">
+    <div class="hud-row">
+      <span class="lbl" title="Your current size. You can eat fish about 1.2x smaller than you.">SIZE</span>
+      <b id="hudSize">10.0</b>
+      <span class="chip" id="hudLevel">Lv 1</span>
+    </div>
+    <div class="bar growth" title="Growth progress toward the next size level"><i id="hudGrowth"></i></div>
+    <div class="hint" id="hudNext">Next evolution at Lv 3</div>
+    <div class="hud-row" style="margin-top:10px">
+      <span class="lbl" title="Hold the left mouse button (or Space) to burst. Needs at least 15 energy to start.">BURST</span>
+      <span class="hint" id="hudEnergyNum">100</span>
+    </div>
+    <div class="bar energy" title="Burst energy. Regenerates when you are not bursting."><i id="hudEnergy"></i><u id="hudEnergyMin"></u></div>
+  </div>
+
+  <div class="hud-center">
+    <div class="zone-label" id="hudZone">The Shallow Reef</div>
+    <div class="danger hidden" id="hudDanger" role="alert"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 2 L23 21 H1 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M12 9 V15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="18" r="1.4" fill="currentColor"/></svg><span>Predator close!</span></div>
+    <div class="hiddenTag hidden" id="hudHidden">Hidden in cover</div>
+  </div>
+
+  <div class="hud-right">
+    <button class="icon-btn" data-open="map" title="Map (M)" aria-label="Open map"><svg viewBox="0 0 24 24"><path d="M3 6 L9 4 L15 6 L21 4 V18 L15 20 L9 18 L3 20 Z M9 4 V18 M15 6 V20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" data-open="journal" title="Discovery journal (J)" aria-label="Open journal"><svg viewBox="0 0 24 24"><path d="M5 3 H17 A2 2 0 0 1 19 5 V21 H7 A2 2 0 0 1 5 19 Z M9 8 H15 M9 12 H15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+    <button class="icon-btn" data-open="evo" title="Evolutions (E)" aria-label="Open evolutions"><svg viewBox="0 0 24 24"><path d="M12 21 V11 M12 11 C12 6 8 5 5 4 C5 8 7 11 12 11 M12 14 C12 9 16 8 19 7 C19 11 17 14 12 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" data-open="pause" title="Pause (Esc)" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5 V19 M16 5 V19" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <div class="hud-evochips" id="hudEvoChips"></div>
+  <div class="hud-tip" id="hudTip"></div>
+  <button class="btn touch-burst hidden" id="touchBurst">BURST</button>
+</div>
+
+<div id="banner" class="banner"></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="fade"></div>
+
+<!-- ============ SCREENS ============ -->
+<main id="screens">
+
+  <section id="screen-menu" class="screen base open">
+    <div class="menu-wrap">
+      <h1 class="title"><span>LITTLE</span><span>OCEAN</span></h1>
+      <p class="tagline">a cozy tale of growing up in the deep blue</p>
+      <nav class="menu-list">
+        <button class="btn big hidden" id="btnContinue">Continue Run</button>
+        <button class="btn big" id="btnNew">Start New Run</button>
+        <button class="btn" data-open="journal">Discoveries</button>
+        <button class="btn" data-open="evo">Evolution Collection</button>
+        <button class="btn" data-open="settings">Settings</button>
+        <button class="btn ghost" id="btnReset">Reset Save Data</button>
+      </nav>
+      <p class="credit" id="menuStats"></p>
+      <p class="credit small">Mouse: swim &nbsp;·&nbsp; Left click / Space: burst &nbsp;·&nbsp; Esc: pause</p>
+    </div>
+  </section>
+
+  <section id="screen-pause" class="screen modal">
+    <div class="panel narrow">
+      <h2>Paused</h2>
+      <div class="stack">
+        <button class="btn big" data-back>Resume</button>
+        <button class="btn" data-open="map">Map</button>
+        <button class="btn" data-open="journal">Discoveries</button>
+        <button class="btn" data-open="evo">Evolution Information</button>
+        <button class="btn" data-open="settings">Settings</button>
+        <button class="btn ghost" id="btnToMenu">Return to Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-journal" class="screen modal">
+    <div class="panel wide">
+      <header class="panel-head"><h2>Discovery Journal</h2><button class="btn small" data-back>Close</button></header>
+      <div class="tabs" id="journalTabs" role="tablist">
+        <button class="tab active" data-tab="fish" role="tab">Fish</button>
+        <button class="tab" data-tab="legend" role="tab">Legendary</button>
+        <button class="tab" data-tab="zones" role="tab">Zones</button>
+        <button class="tab" data-tab="places" role="tab">Places</button>
+      </div>
+      <p class="sub" id="journalSummary"></p>
+      <div class="cards" id="journalBody"></div>
+    </div>
+  </section>
+
+  <section id="screen-evo" class="screen modal">
+    <div class="panel wide">
+      <header class="panel-head"><h2>Evolution Collection</h2><button class="btn small" data-back>Close</button></header>
+      <p class="sub">Each run you may pick one upgrade at every evolution milestone. Unlocked options are kept forever; milestones must be earned again each run.</p>
+      <div class="evo-tree" id="evoTree"></div>
+      <h3>Cosmetic Shimmer</h3>
+      <div class="cosmetics" id="cosmetics"></div>
+      <p class="hint" id="evoRunInfo"></p>
+    </div>
+  </section>
+
+  <section id="screen-settings" class="screen modal">
+    <div class="panel narrow">
+      <header class="panel-head"><h2>Settings</h2><button class="btn small" data-back>Back</button></header>
+      <label class="row">Music volume <input type="range" id="setMusic" min="0" max="100"></label>
+      <label class="row">Sound effects <input type="range" id="setSfx" min="0" max="100"></label>
+      <label class="row check"><input type="checkbox" id="setMute"> Mute all audio</label>
+      <label class="row check"><input type="checkbox" id="setFx"> Rich visual effects (light rays, extra particles)</label>
+      <label class="row check"><input type="checkbox" id="setShake"> Camera shake</label>
+      <div class="stack"><button class="btn ghost" id="btnReset2">Reset Save Data…</button></div>
+      <p class="hint">Settings are saved automatically.</p>
+    </div>
+  </section>
+
+  <section id="screen-map" class="screen modal">
+    <div class="panel wide">
+      <header class="panel-head"><h2>Ocean Map</h2><button class="btn small" data-back>Close</button></header>
+      <canvas id="mapCanvas" width="960" height="540"></canvas>
+      <p class="hint">Gold arrow: you. Currents (marked with a size) block passages until you are big enough. Unknown regions stay hidden until you find them.</p>
+    </div>
+  </section>
+
+  <section id="screen-evochoice" class="screen modal">
+    <div class="panel wide">
+      <h2 id="evoChoiceTitle">Evolve!</h2>
+      <p class="sub" id="evoChoiceSub">Choose one upgrade. Keys 1-3 also work.</p>
+      <div class="evo-cards" id="evoChoices"></div>
+    </div>
+  </section>
+
+  <section id="screen-death" class="screen modal">
+    <div class="panel narrow">
+      <h2>The Tide Takes You</h2>
+      <p class="sub" id="deathCause"></p>
+      <ul class="summary" id="deathSummary"></ul>
+      <div class="stack">
+        <button class="btn big" id="btnAgain">Swim Again</button>
+        <button class="btn" data-open="journal">Discoveries</button>
+        <button class="btn ghost" id="btnDeathMenu">Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-confirm" class="screen modal top">
+    <div class="panel narrow">
+      <h2 id="confirmTitle">Are you sure?</h2>
+      <p class="sub" id="confirmText"></p>
+      <div class="row-btns">
+        <button class="btn" id="confirmNo">Cancel</button>
+        <button class="btn danger" id="confirmYes">Confirm</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/util.js"></script>
+<script src="js/config.js"></script>
+<script src="js/species.js"></script>
+<script src="js/save.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/fishart.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/world.js"></script>
+<script src="js/scenery.js"></script>
+<script src="js/evolution.js"></script>
+<script src="js/progression.js"></script>
+<script src="js/fish.js"></script>
+<script src="js/player.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

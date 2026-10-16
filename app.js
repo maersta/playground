@@ -111,6 +111,8 @@ const games = [
    HELPERS
 ========================================================= */
 
+const FAV_KEY = "playground:favorites";
+
 function initials(title) {
     return title
         .split(" ")
@@ -124,42 +126,80 @@ function isAvailable(game) {
     return game.status.toLowerCase() === "available";
 }
 
+function gameUrl(game) {
+    return `games/${encodeURIComponent(game.slug)}/`;
+}
+
+function loadFavorites() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(FAV_KEY));
+        return new Set(Array.isArray(saved) ? saved : []);
+    } catch (e) {
+        return new Set();
+    }
+}
+
+function saveFavorites() {
+    try {
+        localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+    } catch (e) {
+        /* storage unavailable: favourites last for this visit only */
+    }
+}
+
+const favorites = loadFavorites();
+const playable = games.filter(isAvailable);
+
 
 /* =========================================================
-   RENDER: FEATURED CARD
+   RENDER: HERO (featured game, stats, ticker)
 ========================================================= */
 
 function renderFeatured() {
     const container = document.getElementById("featuredCard");
-    if (!container) return;
-
-    const featuredGame = games.find(game => game.featured);
+    const featuredGame = games.find(game => game.featured) || playable[0];
 
     if (!featuredGame) {
         container.style.display = "none";
         return;
     }
 
-    container.innerHTML = `
-        <div class="featured-glow" aria-hidden="true"></div>
-        <div class="featured-content">
-            <div class="featured-label">Featured game</div>
-            <h2>${featuredGame.title}</h2>
-            <p>${featuredGame.description}</p>
-            <a href="games/${featuredGame.slug}/" class="play-button">
-                Play Game
-                <span aria-hidden="true">→</span>
-            </a>
-        </div>
-    `;
+    const bg = featuredGame.image
+        ? ` style="background-image: url('${featuredGame.image}')"`
+        : "";
 
-    if (featuredGame.image) {
-        container.classList.add("has-image");
-        container.style.backgroundImage = `
-            linear-gradient(120deg, rgba(13, 15, 21, 0.55), rgba(13, 15, 21, 0.88)),
-            url('${featuredGame.image}')
-        `;
-    }
+    container.innerHTML = `
+        <a class="feature-cabinet" href="${gameUrl(featuredGame)}">
+            <span class="feature-sticker">★ Featured</span>
+            <span class="feature-screen${featuredGame.image ? " has-image" : ""}"${bg}>
+                <span class="feature-play" aria-hidden="true">▶</span>
+            </span>
+            <span class="feature-info">
+                <span class="feature-text">
+                    <span class="feature-cat">${featuredGame.category}</span>
+                    <strong>${featuredGame.title}</strong>
+                    <span class="feature-desc">${featuredGame.description}</span>
+                </span>
+                <span class="feature-go">Play</span>
+            </span>
+        </a>
+    `;
+}
+
+function renderStats() {
+    const categories = new Set(games.map(game => game.category));
+
+    document.getElementById("heroStats").innerHTML = `
+        <div class="stat"><strong>${playable.length}</strong><span>Games</span></div>
+        <div class="stat"><strong>${categories.size}</strong><span>Genres</span></div>
+        <div class="stat"><strong>0</strong><span>Sign-ups</span></div>
+    `;
+}
+
+function renderTicker() {
+    const items = games.map(game => `<span>★ ${game.title}</span>`).join("");
+    // doubled so the CSS loop is seamless
+    document.getElementById("tickerTrack").innerHTML = items + items;
 }
 
 
@@ -170,9 +210,10 @@ function renderFeatured() {
 function renderGames() {
     const grid = document.getElementById("gameGrid");
 
-    grid.innerHTML = games.map(game => {
+    grid.innerHTML = games.map((game, index) => {
         const available = isAvailable(game);
         const categoryLower = game.category.toLowerCase();
+        const isFav = favorites.has(game.slug);
 
         const imageStyle = game.image ? ` style="background-image: url('${game.image}')"` : "";
         const imageIcon = game.image ? "" : `<div class="game-icon">${initials(game.title)}</div>`;
@@ -180,31 +221,38 @@ function renderGames() {
         const inner = `
             <div class="game-image${game.image ? " has-image" : ""}"${imageStyle}>
                 ${imageIcon}
+                <span class="game-category">${game.category}</span>
             </div>
             <div class="game-info">
-                <div class="game-meta">
-                    <span class="game-category">${game.category}</span>
-                    <span class="game-status${available ? "" : " is-soon"}">${game.status}</span>
-                </div>
                 <h3>${game.title}</h3>
                 <p>${game.description}</p>
                 <div class="game-link${available ? "" : " is-disabled"}">
-                    <span>${available ? "Play now" : "Coming soon"}</span>
-                    <span aria-hidden="true">→</span>
+                    <span class="game-status${available ? "" : " is-soon"}">● ${available ? "Ready" : game.status}</span>
+                    <span class="game-cta">${available ? 'Play <i aria-hidden="true">▶</i>' : "Coming soon"}</span>
                 </div>
             </div>
         `;
 
+        const fav = `
+            <button class="fav-btn${isFav ? " is-fav" : ""}" type="button"
+                    data-slug="${game.slug}"
+                    aria-pressed="${isFav}"
+                    aria-label="Favourite ${game.title}">♥</button>
+        `;
+
+        const attrs = `data-category="${categoryLower}" data-title="${game.title}" data-slug="${game.slug}" style="--i: ${index}"`;
+
         if (available) {
             return `
-                <article class="game-card" data-category="${categoryLower}" data-title="${game.title}">
-                    <a href="games/${game.slug}/">${inner}</a>
+                <article class="game-card" ${attrs}>
+                    <a href="${gameUrl(game)}">${inner}</a>
+                    ${fav}
                 </article>
             `;
         }
 
         return `
-            <article class="game-card is-disabled" data-category="${categoryLower}" data-title="${game.title}" aria-disabled="true">
+            <article class="game-card is-disabled" ${attrs} aria-disabled="true">
                 ${inner}
             </article>
         `;
@@ -213,15 +261,30 @@ function renderGames() {
 
 
 /* =========================================================
-   FILTERING + SEARCH
+   FILTERING + SEARCH + FAVOURITES
 ========================================================= */
 
 function setupControls() {
     const filters = document.querySelectorAll(".filter");
     const searchInput = document.getElementById("searchInput");
     const emptyState = document.getElementById("emptyState");
+    const emptyHint = document.getElementById("emptyHint");
+    const grid = document.getElementById("gameGrid");
+    const favCount = document.getElementById("favCount");
 
     let activeCategory = "all";
+
+    // show how many games sit in each category
+    filters.forEach(filter => {
+        const cat = filter.dataset.category;
+        if (cat === "favorites") return;
+
+        const count = cat === "all"
+            ? games.length
+            : games.filter(game => game.category.toLowerCase() === cat).length;
+
+        filter.insertAdjacentHTML("beforeend", `<em>${count}</em>`);
+    });
 
     function updateGames() {
         const cards = document.querySelectorAll(".game-card");
@@ -233,7 +296,9 @@ function setupControls() {
             const category = card.dataset.category;
             const title = card.dataset.title.toLowerCase();
 
-            const matchesCategory = activeCategory === "all" || category === activeCategory;
+            const matchesCategory =
+                activeCategory === "all" ||
+                (activeCategory === "favorites" ? favorites.has(card.dataset.slug) : category === activeCategory);
             const matchesSearch = title.includes(searchTerm);
 
             if (matchesCategory && matchesSearch) {
@@ -244,20 +309,56 @@ function setupControls() {
             }
         });
 
-        emptyState.style.display = visibleGames === 0 ? "block" : "none";
+        emptyHint.textContent = activeCategory === "favorites" && !searchTerm
+            ? "Tap the heart on a game to save it here."
+            : "Try a different search or category.";
+        emptyState.style.display = visibleGames === 0 ? "flex" : "none";
+        favCount.textContent = favorites.size;
+    }
+
+    function selectCategory(category) {
+        activeCategory = category;
+        filters.forEach(button => button.classList.toggle("active", button.dataset.category === category));
+        updateGames();
     }
 
     filters.forEach(filter => {
-        filter.addEventListener("click", () => {
-            filters.forEach(button => button.classList.remove("active"));
-            filter.classList.add("active");
-
-            activeCategory = filter.dataset.category;
-            updateGames();
-        });
+        filter.addEventListener("click", () => selectCategory(filter.dataset.category));
     });
 
     searchInput.addEventListener("input", updateGames);
+
+    grid.addEventListener("click", event => {
+        const btn = event.target.closest(".fav-btn");
+        if (!btn) return;
+
+        const slug = btn.dataset.slug;
+        if (favorites.has(slug)) favorites.delete(slug);
+        else favorites.add(slug);
+
+        btn.classList.toggle("is-fav", favorites.has(slug));
+        btn.setAttribute("aria-pressed", favorites.has(slug));
+        saveFavorites();
+        updateGames();
+    });
+
+    document.getElementById("favNav").addEventListener("click", () => {
+        selectCategory("favorites");
+        document.getElementById("games").scrollIntoView({ behavior: "smooth" });
+    });
+
+    updateGames();
+}
+
+function setupSurprise() {
+    const go = () => {
+        if (!playable.length) return;
+        const pick = playable[Math.floor(Math.random() * playable.length)];
+        window.location.href = gameUrl(pick);
+    };
+
+    document.getElementById("surpriseNav").addEventListener("click", go);
+    document.getElementById("surpriseHero").addEventListener("click", go);
 }
 
 
@@ -266,5 +367,8 @@ function setupControls() {
 ========================================================= */
 
 renderFeatured();
+renderStats();
+renderTicker();
 renderGames();
 setupControls();
+setupSurprise();

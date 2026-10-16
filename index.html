@@ -6,11 +6,27 @@
 
     <title>Playground — Games. Experiments. Whatever.</title>
     <meta name="description" content="Playground is a collection of small games, experiments and random ideas. Pick something and start playing.">
+    <meta name="theme-color" content="#2b1065">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+    <!-- floating background decoration -->
+    <div class="bg-deco" aria-hidden="true">
+        <span style="--x: 6%;  --y: 14%; --s: 34px; --d: 0s;">★</span>
+        <span style="--x: 92%; --y: 10%; --s: 26px; --d: 1.2s;">✦</span>
+        <span style="--x: 84%; --y: 46%; --s: 40px; --d: 0.6s;">◆</span>
+        <span style="--x: 3%;  --y: 58%; --s: 30px; --d: 2s;">✚</span>
+        <span style="--x: 95%; --y: 78%; --s: 32px; --d: 1.6s;">★</span>
+        <span style="--x: 10%; --y: 90%; --s: 24px; --d: 0.3s;">✦</span>
+    </div>
+
 
     <!-- =========================
          NAVIGATION
@@ -19,17 +35,65 @@
     <nav class="navbar">
         <div class="nav-inner">
 
-            <a href="#" class="logo">
+            <a href="#top" class="logo">
                 <span class="logo-mark">P</span>
-                <span>Playground</span>
+                <span class="logo-text">Playground</span>
             </a>
 
             <div class="nav-links">
-                <a href="#games">Games</a>
+                <a href="#games" class="nav-link">Games</a>
+                <button class="nav-pill" id="favNav" type="button" aria-label="Show favourite games">
+                    <span aria-hidden="true">♥</span>
+                    <span id="favCount">0</span>
+                </button>
+                <button class="nav-btn" id="surpriseNav" type="button">
+                    <span aria-hidden="true">🎲</span> <span class="nav-btn-label">Surprise me</span>
+                </button>
             </div>
 
         </div>
     </nav>
+
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
+    <header class="hero" id="top">
+        <div class="hero-inner">
+
+            <div class="hero-copy">
+                <div class="hero-badge"><span class="pulse-dot"></span> Insert coin to play</div>
+                <h1>
+                    <span class="h1-line">Press</span>
+                    <span class="h1-line h1-big">Play<span class="h1-accent">ground</span></span>
+                </h1>
+                <p>A pocket arcade of tiny games, wild experiments and random ideas. No installs, no sign-ups. Just pick one and go.</p>
+
+                <div class="hero-actions">
+                    <a href="#games" class="btn btn-primary">
+                        <span aria-hidden="true">▶</span> Start playing
+                    </a>
+                    <button class="btn btn-ghost" id="surpriseHero" type="button">
+                        <span aria-hidden="true">🎲</span> Surprise me
+                    </button>
+                </div>
+
+                <div class="hero-stats" id="heroStats"></div>
+            </div>
+
+            <div class="hero-feature" id="featuredCard">
+                <!-- Rendered dynamically from games data in app.js -->
+            </div>
+
+        </div>
+    </header>
+
+
+    <!-- scrolling ticker -->
+    <div class="ticker" aria-hidden="true">
+        <div class="ticker-track" id="tickerTrack"></div>
+    </div>
 
 
     <!-- =========================
@@ -41,12 +105,12 @@
         <div class="section-header">
 
             <div class="section-title">
-                <h2>All games</h2>
-                <p>Everything in the collection, in one place.</p>
+                <h2>Pick your game</h2>
+                <p>Choose a cabinet. Every game is free to play.</p>
             </div>
 
             <div class="search">
-                <span class="search-icon" aria-hidden="true">⌕</span>
+                <span class="search-icon" aria-hidden="true">🔍</span>
                 <input
                     type="search"
                     id="searchInput"
@@ -61,26 +125,30 @@
 
         <!-- FILTERS -->
 
-        <div class="filters" role="group" aria-label="Filter games by category">
+        <div class="filters" role="group" aria-label="Filter games by category" id="filters">
 
             <button class="filter active" data-category="all">
-                All
+                <span aria-hidden="true">🎮</span> All
             </button>
 
             <button class="filter" data-category="party">
-                Party
+                <span aria-hidden="true">🎉</span> Party
             </button>
 
             <button class="filter" data-category="arcade">
-                Arcade
+                <span aria-hidden="true">👾</span> Arcade
             </button>
 
             <button class="filter" data-category="casual">
-                Casual
+                <span aria-hidden="true">🌈</span> Casual
             </button>
 
             <button class="filter" data-category="experimental">
-                Experimental
+                <span aria-hidden="true">🧪</span> Experimental
+            </button>
+
+            <button class="filter" data-category="favorites">
+                <span aria-hidden="true">♥</span> Favourites
             </button>
 
         </div>
@@ -93,7 +161,9 @@
         </div>
 
         <div class="empty-state" id="emptyState">
-            No games found.
+            <div class="empty-icon" aria-hidden="true">👻</div>
+            <strong>No games found.</strong>
+            <span id="emptyHint">Try a different search or category.</span>
         </div>
 
     </main>
@@ -107,8 +177,9 @@
 
         <div class="footer-inner">
 
-            <span>Playground</span>
+            <span class="footer-logo"><span class="logo-mark">P</span> Playground</span>
             <span>Games. Experiments. Whatever.</span>
+            <a href="#top" class="footer-top">Back to top ↑</a>
 
         </div>
 
